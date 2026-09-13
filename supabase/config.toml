@@ -394,6 +394,11 @@ verify_jwt = false
 [functions.password-login]
 verify_jwt = false
 
+# Die Function wird ausschliesslich vom Datenbank-Webhook aufgerufen und
+# validiert dessen eigenes, langes Shared Secret vor jedem Datenzugriff.
+[functions.send-message-email]
+verify_jwt = false
+
 # [edge_runtime.secrets]
 # secret_key = "env(SECRET_VALUE)"
 

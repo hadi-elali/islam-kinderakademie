@@ -417,6 +417,10 @@ Mitteilungen an alle, an ein bestimmtes Profil oder an eine Zeitgruppe. Beim ers
 
 Personenbezogene Lesebestätigungen für Mitteilungen. Pro Profil und Mitteilung existiert höchstens ein Datensatz. Familien sehen ausschließlich ihre eigenen Lesebestätigungen; eine Bestätigung darf nur für eine Mitteilung angelegt werden, die das Profil durch die Mitteilungs-RLS tatsächlich lesen kann.
 
+#### `message_email_deliveries`
+
+Privates, ausschließlich serverseitig zugängliches Versandprotokoll für Brevo-E-Mail-Hinweise. Pro Mitteilung und Empfängerprofil existiert höchstens ein Datensatz. Die Edge Function `send-message-email` ermittelt Empfänger über eine nur für `service_role` freigegebene Datenbankfunktion, versendet keinen vollständigen Nachrichtentext und verhindert über atomare Versandansprüche doppelte E-Mails. `BREVO_API_KEY`, Absenderdaten und `MESSAGE_EMAIL_WEBHOOK_SECRET` gehören ausschließlich in die Supabase-Function-Secrets.
+
 ### Beziehungen
 
 ```text
@@ -515,7 +519,7 @@ Aktueller relevanter Stand:
 
 Alle genannten Migrationen sind auf dem aktuell verknüpften Supabase-Projekt ausgeführt. Remote-Schema-Lint war danach fehlerfrei.
 
-Noch lokal anzuwenden: `20260909120000_message_read_receipts.sql` ergänzt den personenbezogenen Lesestatus für zugängliche Mitteilungen mit eigener RLS.
+Noch lokal anzuwenden: `20260909120000_message_read_receipts.sql` ergänzt den personenbezogenen Lesestatus für zugängliche Mitteilungen mit eigener RLS. `20260909130000_message_email_delivery.sql` ergänzt das private Brevo-Versandprotokoll und die nur serverseitig aufrufbare Empfängerermittlung.
 
 Weitere Seeds oder fachliche Beispieldaten nur auf ausdrücklichen Auftrag anlegen.
 
@@ -554,6 +558,7 @@ Bereits funktional umgesetzt:
 - automatische persönliche Mitteilung an das Elternkonto, sobald ein Kind für eine Zeitgruppe freigeschaltet wurde
 - kompakte Mitteilungsübersicht mit Titel/erstem Satz und separater Detailansicht
 - blauer Ungelesen-Hinweis in Desktop-, Mobil- und Kopfnavigation sowie hervorgehobene ungelesene Mitteilungen; der Status wird beim Öffnen profilbezogen gespeichert
+- transaktionale Brevo-E-Mail-Hinweise bei neu veröffentlichten Mitteilungen über eine mit Shared Secret geschützte Datenbank-Webhook-Function; Empfänger werden für alle Familien, persönliche Profile und genehmigte Zeitgruppen serverseitig dedupliziert
 - Abzeichenverwaltung und persönliche Verleihung
 - Abgabenübersicht für das Akademieteam
 - private Medien-Uploads, signierte Download-Links und Löschung in Supabase Storage
