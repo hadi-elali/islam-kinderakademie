@@ -61,7 +61,7 @@ export default function LandingScreen() {
       <View style={[styles.hero, compact && styles.heroCompact, small && styles.heroSmall]}>
         <View style={styles.heroCopy}>
           <Pill tone="sun" icon="trophy">
-            Islamisches Lernen, das Kinder erreicht
+            Den Islam kindgerecht entdecken und verstehen.
           </Pill>
           <AppText
             variant="display"
@@ -73,8 +73,7 @@ export default function LandingScreen() {
             Wissen, Gemeinschaft und Freude am Glauben.
           </AppText>
           <AppText color={Palette.inkSoft} style={styles.heroDescription}>
-            Eine digitale Akademie für Live-Unterricht und kleine interaktive Lerneinheiten –
-            übersichtlich für Kinder und Eltern.
+           Eine digitale Akademie, die den Live-Unterricht für Kinder durch eine strukturierte Übersicht und ergänzende Lernmaterialien unterstützt.
           </AppText>
           <View style={[styles.heroActions, small && styles.heroActionsSmall]}>
             <PublicButton
