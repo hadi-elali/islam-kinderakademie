@@ -198,6 +198,9 @@ function LessonEditor({
     initialLesson
       ? data.liveSessions.find(
           (session) =>
+            session.lesson_id === initialLesson.id && session.group_id === null,
+        ) ?? data.liveSessions.find(
+          (session) =>
             session.lesson_id ===
             initialLesson.id,
         ) ?? null
@@ -319,16 +322,6 @@ function LessonEditor({
   );
 
   const [
-    liveGroupId,
-    setLiveGroupId,
-  ] = useState<
-    number | null
-  >(
-    existingSession?.group_id ??
-      null,
-  );
-
-  const [
     liveTitle,
     setLiveTitle,
   ] = useState(
@@ -402,14 +395,6 @@ function LessonEditor({
     journeyId ??
     data.journeys[0]?.id ??
     null;
-  const effectiveJourney = data.journeys.find(
-    (journey) => journey.id === effectiveJourneyId,
-  );
-  const compatibleTimeGroups = data.groups.filter(
-    (group) =>
-      group.age_group_id === effectiveJourney?.age_group_id &&
-      group.academy_year_id === effectiveJourney?.academy_year_id,
-  );
   const lessonDocuments = initialLesson
     ? data.lessonDocuments
         .filter((document) => document.lesson_id === initialLesson.id)
@@ -460,17 +445,6 @@ function LessonEditor({
     if (
       hasLiveSession
     ) {
-      if (
-        liveGroupId &&
-        !compatibleTimeGroups.some((group) => group.id === liveGroupId)
-      ) {
-        setFormError(
-          'Die Zeitgruppe muss zur Altersgruppe der ausgewählten Lernreise gehören.',
-        );
-
-        return;
-      }
-
       const startsAt =
         combineLocalDateTime(
           liveDate,
@@ -505,7 +479,7 @@ function LessonEditor({
           0,
 
         group_id:
-          liveGroupId,
+          null,
 
         title:
           liveTitle ||
@@ -603,9 +577,6 @@ function LessonEditor({
                 ? {
                     id:
                       existingSession?.id,
-
-                    groupId:
-                      liveSession.group_id,
 
                     title:
                       liveSession.title ??
@@ -918,24 +889,7 @@ function LessonEditor({
                 value={
                   effectiveJourneyId
                 }
-                onChange={(nextJourneyId) => {
-                  setJourneyId(nextJourneyId);
-
-                  const nextJourney = data.journeys.find(
-                    (journey) => journey.id === nextJourneyId,
-                  );
-
-                  setLiveGroupId((currentGroupId) =>
-                    data.groups.some(
-                      (group) =>
-                        group.id === currentGroupId &&
-                        group.age_group_id === nextJourney?.age_group_id &&
-                        group.academy_year_id === nextJourney?.academy_year_id,
-                    )
-                      ? currentGroupId
-                      : null,
-                  );
-                }}
+                onChange={setJourneyId}
                 options={data.journeys.map(
                   (
                     journey,
@@ -1210,10 +1164,8 @@ function LessonEditor({
                     Palette.inkSoft
                   }
                 >
-                  Termin,
-                  Kursgruppe und
-                  Zugang werden
-                  zeitlich geplant.
+                  Ein gemeinsamer Termin und Zoom-Zugang gelten für alle
+                  Zeitgruppen der Lektion.
                 </AppText>
               </View>
 
@@ -1282,26 +1234,6 @@ function LessonEditor({
                     }
                   />
 
-                  <ChoiceChips
-                    label="Zeitgruppe (optional)"
-                    value={
-                      liveGroupId
-                    }
-                    allowEmpty
-                    onChange={
-                      setLiveGroupId
-                    }
-                    options={compatibleTimeGroups.map(
-                      (
-                        group,
-                      ) => ({
-                        value:
-                          group.id,
-                        label: `${group.name} · ${group.schedule_label}`,
-                      }),
-                    )}
-                  />
-
                   <DateField
                     label="Datum"
                     value={
@@ -1352,6 +1284,7 @@ function LessonEditor({
 
                   <Field
                     label="Zoom-Zugang"
+                    helper="Dieser Link gilt für alle Zeitgruppen der Altersgruppe im Akademiejahr dieser Lektion."
                     placeholder="https://zoom.us/…"
                     value={
                       meetingUrl

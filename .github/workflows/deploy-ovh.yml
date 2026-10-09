@@ -3,7 +3,7 @@ name: Web-App auf OVHcloud veroeffentlichen
 on:
   push:
     branches:
-      - erweiterung5
+      - erweiterung6
   workflow_dispatch:
 
 permissions:

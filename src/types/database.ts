@@ -426,7 +426,6 @@ export type LessonEditorInput = {
   replayUrl?: string | null;
   liveSession?: {
     id?: number;
-    groupId?: number | null;
     title?: string;
     startsAt: string;
     endsAt: string;

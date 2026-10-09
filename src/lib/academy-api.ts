@@ -521,7 +521,6 @@ export async function saveLesson(
         lesson.id,
 
       group_id:
-        input.liveSession.groupId ??
         null,
 
       title:
@@ -553,6 +552,16 @@ export async function saveLesson(
         'live_sessions',
         sessionValues
       );
+    }
+
+    if (input.id) {
+      // Auch vorhandene gruppenspezifische Termine verwenden den gemeinsamen Link.
+      const { error } = await client()
+        .from('live_sessions')
+        .update({ meeting_url: sessionValues.meeting_url })
+        .eq('lesson_id', lesson.id);
+
+      fail(error);
     }
   }
 
