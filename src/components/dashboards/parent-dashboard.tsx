@@ -1,3 +1,4 @@
+import { TeachingContacts } from '@/components/teaching-contacts';
 import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -119,6 +120,7 @@ export function ParentDashboard() {
       description="Termine, Aufgaben und der persönliche Fortschritt deiner Kinder."
       action={<ActionButton label="Kind hinzufügen" icon="add" onPress={() => router.push('/kinder')} />}>
       {error && <ErrorBanner message={error} onRetry={() => void refresh()} />}
+      <TeachingContacts ageGroupIds={[...new Set(ownChildren.map((child) => child.age_group_id))]} />
       <View style={styles.statsGrid}>
         <StatCard icon="children" value={String(ownChildren.length)} label="Kinderprofile" tone="mint" />
         <StatCard icon="calendar" value={String(upcomingSessions.length)} label="Anstehende Termine" tone="sky" />

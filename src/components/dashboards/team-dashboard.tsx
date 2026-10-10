@@ -5,6 +5,7 @@ import { AppIcon, AppIconName } from '@/components/ui/app-icon';
 import { DataLoading, ErrorBanner } from '@/components/ui/data-ui';
 import { ActionButton, AppText, Card, EmptyState, PageScaffold, Pill, SectionHeader, StatCard } from '@/components/ui/primitives';
 import { Layout, Palette, Space } from '@/constants/design';
+import { useAuth } from '@/context/auth-context';
 import { useAcademyData } from '@/context/academy-data-context';
 import { formatDateTime } from '@/utils/format';
 
@@ -21,11 +22,11 @@ const quickActions: { label: string; description: string; icon: AppIconName; hre
 
 export function TeamDashboard() {
   const router = useRouter();
+  const { profile } = useAuth();
   const { width } = useWindowDimensions();
   const stacked = width < Layout.contentStackBreakpoint;
   const { data, isLoading, error, refresh } = useAcademyData();
   const setup = [
-    { label: 'Akademiejahr anlegen', done: data.academyYears.length > 0, href: '/curriculum' },
     { label: 'Zeitgruppen einrichten', done: data.groups.length > 0, href: '/gruppen' },
     { label: 'Lernreisen erstellen', done: data.journeys.length > 0, href: '/curriculum' },
     { label: 'Erste Lektion veröffentlichen', done: data.lessons.some((lesson) => lesson.status === 'published'), href: '/lektion-neu' },
@@ -40,10 +41,13 @@ export function TeamDashboard() {
   return (
     <PageScaffold
       eyebrow="Team-Bereich"
-      title="Akademie verwalten"
-      description="Live-Daten für Curriculum, Unterricht, Familien und Lernfortschritt."
-      action={<ActionButton label="Neue Lektion" icon="add" onPress={() => router.push('/lektion-neu')} />}>
+      title={data.ageGroups[0]?.title ? `Unterricht: ${data.ageGroups[0].title}` : "Mein Unterricht"}
+      description="Verwalte Unterricht und Lernfortschritt deiner zugewiesenen Altersgruppe."
+      action={<ActionButton label="Neue Lektion" icon="add" disabled={data.ageGroups.length === 0} onPress={() => router.push('/lektion-neu')} />}>
       {error && <ErrorBanner message={error} onRetry={() => void refresh()} />}
+      {!isLoading && profile?.role === 'teacher' && data.ageGroups.length === 0 && (
+        <Card tone="sun"><AppText variant="bodyStrong">Noch keiner Altersgruppe zugeordnet</AppText><AppText>Bitte kontaktiere die Administration. Sobald deine Altersgruppe zugewiesen ist, kannst du ihre Inhalte bearbeiten.</AppText></Card>
+      )}
       <View style={styles.statsGrid}>
         <StatCard icon="groups" value={String(data.groups.length)} label="Zeitgruppen" tone="mint" />
         <StatCard icon="lessons" value={String(data.lessons.length)} label="Lektionen" tone="sky" />

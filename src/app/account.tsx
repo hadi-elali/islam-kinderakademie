@@ -4,6 +4,7 @@ import { StyleSheet, useWindowDimensions, View } from "react-native";
 import { AuthCaptcha } from "@/components/auth/auth-captcha";
 import type { AuthCaptchaHandle } from "@/components/auth/auth-captcha.types";
 import { AppIcon } from "@/components/ui/app-icon";
+import { StaffPortrait } from "@/components/staff-portrait";
 import { ErrorBanner, FormDialog } from "@/components/ui/data-ui";
 import {
   ActionButton,
@@ -48,7 +49,8 @@ export default function AccountScreen() {
   const { user, profile, signOut, isProfileLoading, refreshProfile } =
     useAuth();
 
-  const { execute } = useAcademyData();
+  const { data, execute } = useAcademyData();
+  const staffContact = data.teachingContacts.find((contact) => contact.profile_id === profile?.id);
 
   const [error, setError] = useState<string | null>(null);
   const [signingOut, setSigningOut] = useState(false);
@@ -371,9 +373,9 @@ export default function AccountScreen() {
       <View style={[styles.layout, compact && styles.column]}>
         <Card style={[styles.profileCard, compact && styles.fullWidth]}>
           <View style={styles.profileHeader}>
-            <View style={styles.avatar}>
+            {profile?.role !== 'parent' ? <StaffPortrait name={displayName} url={staffContact?.portrait_url ?? null} size={72} /> : <View style={styles.avatar}>
               <AppText variant="heading">{initials || "IK"}</AppText>
-            </View>
+            </View>}
 
             <View style={styles.profileCopy}>
               <AppText variant="heading">{displayName}</AppText>
@@ -400,6 +402,8 @@ export default function AccountScreen() {
               label="E-Mail-Adresse"
               value={user?.email || "–"}
             />
+          {(profile?.role === 'teacher' || (profile?.role === 'admin' && staffContact?.age_group_id != null)) && <AccountDetail icon="groups" label={profile?.role === 'admin' ? 'Altersgruppe als Dozent' : 'Meine Altersgruppe'}
+              value={data.ageGroups.find((group) => group.id === staffContact?.age_group_id)?.title ?? 'Noch nicht zugeordnet'} />}
 
             <AccountDetail
               icon="lock"
@@ -620,7 +624,7 @@ function AccountDetail({
   label,
   value,
 }: {
-  icon: "profile" | "messages" | "lock";
+  icon: "profile" | "messages" | "lock" | "groups";
   label: string;
   value: string;
 }) {

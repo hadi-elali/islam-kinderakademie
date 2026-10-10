@@ -1,3 +1,4 @@
+import { TeachingContacts } from '@/components/teaching-contacts';
 import * as Linking from 'expo-linking';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -106,6 +107,7 @@ export function ChildDashboard() {
   return (
     <PageScaffold eyebrow="Mein Bereich" title={`Salam, ${child.display_name}!`}>
       {error && <ErrorBanner message={error} onRetry={() => void refresh()} />}
+      <TeachingContacts ageGroupIds={[child.age_group_id]} />
       {!contentUnlocked && (
         <Card tone="sun" style={styles.accessCard}>
           <View style={styles.accessIcon}>

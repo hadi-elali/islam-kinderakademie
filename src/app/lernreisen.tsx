@@ -1,3 +1,4 @@
+import { TeachingContacts } from '@/components/teaching-contacts';
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, View } from 'react-native';
 
@@ -51,6 +52,7 @@ export default function LearningJourneysScreen() {
       title="Lernreisen"
       description="Die Lernreisen deiner Altersgruppe sind sichtbar. Ihre Inhalte öffnen sich nach der Zeitgruppenfreigabe.">
       {error && <ErrorBanner message={error} onRetry={() => void refresh()} />}
+      <TeachingContacts ageGroupIds={[child.age_group_id]} />
       {!contentUnlocked && (
         <Card tone="sun" style={styles.accessCard}>
           <View style={styles.accessIcon}>

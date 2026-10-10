@@ -49,6 +49,7 @@ export default function MediaScreen() {
       await execute(() =>
         uploadMediaAsset({
           profileId: profile.id!,
+          ageGroupId: profile.role === 'teacher' ? data.ageGroups[0]?.id ?? null : null,
           fileName: asset.name,
           mimeType: asset.mimeType ?? null,
           size: asset.size ?? null,
@@ -94,7 +95,7 @@ export default function MediaScreen() {
       eyebrow="Team-Bereich"
       title="Medien"
       description="Bilder, Audios, Dokumente und Replays werden in einem privaten Storage-Bucket verwaltet."
-      action={<ActionButton label={uploading ? 'Wird hochgeladen …' : 'Datei hochladen'} icon="add" disabled={uploading} onPress={() => void selectAndUpload()} />}>
+      action={<ActionButton label={uploading ? 'Wird hochgeladen …' : 'Datei hochladen'} icon="add" disabled={uploading || (profile?.role === 'teacher' && data.ageGroups.length === 0)} onPress={() => void selectAndUpload()} />}>
       {loadError && <ErrorBanner message={loadError} onRetry={() => void refresh()} />}
       {actionError && <ErrorBanner message={actionError} />}
       <Card tone="mint" style={styles.uploadCard}>
@@ -103,7 +104,7 @@ export default function MediaScreen() {
           <AppText variant="heading">Private Akademie-Mediathek</AppText>
           <AppText color={Palette.inkSoft}>Dateien sind nur für angemeldete Mitglieder abrufbar. Maximale Größe: 50 MB.</AppText>
         </View>
-        <ActionButton label="Datei auswählen" variant="secondary" disabled={uploading} onPress={() => void selectAndUpload()} />
+        <ActionButton label="Datei auswählen" variant="secondary" disabled={uploading || (profile?.role === 'teacher' && data.ageGroups.length === 0)} onPress={() => void selectAndUpload()} />
       </Card>
 
       <View style={styles.filters}>

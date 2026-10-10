@@ -5,6 +5,7 @@ import { AppIcon } from '@/components/ui/app-icon';
 import { ChoiceChips, DataLoading, ErrorBanner, FormDialog, RowActions } from '@/components/ui/data-ui';
 import { ActionButton, AppText, Card, EmptyState, Field, PageScaffold, Pill } from '@/components/ui/primitives';
 import { Palette, Radius, Space } from '@/constants/design';
+import { useAuth } from '@/context/auth-context';
 import { useAcademyData } from '@/context/academy-data-context';
 import { createRecord, deleteRecord, updateRecord } from '@/lib/academy-api';
 import { BadgeRow } from '@/types/database';
@@ -12,6 +13,7 @@ import { confirmAction } from '@/utils/feedback';
 import { apiErrorMessage } from '@/utils/format';
 
 export default function BadgesScreen() {
+  const { profile } = useAuth();
   const { data, isLoading, error: loadError, refresh, execute } = useAcademyData();
   const [badgeDialog, setBadgeDialog] = useState(false);
   const [awardDialog, setAwardDialog] = useState(false);
@@ -49,7 +51,7 @@ export default function BadgesScreen() {
     }
     setSaving(true);
     try {
-      const values = { title: title.trim(), description: description.trim() || null, icon_key: iconKey.trim() };
+      const values = { age_group_id: profile?.role === 'teacher' ? data.ageGroups[0]?.id ?? null : editing?.age_group_id ?? null, title: title.trim(), description: description.trim() || null, icon_key: iconKey.trim() };
       await execute(() => editing ? updateRecord('badges', editing.id, values) : createRecord('badges', values));
       setBadgeDialog(false);
     } catch (reason) {
@@ -90,7 +92,7 @@ export default function BadgesScreen() {
       eyebrow="Team-Bereich"
       title="Abzeichen"
       description="Persönliche Lernziele definieren und Kinderprofilen verleihen."
-      action={<ActionButton label="Abzeichen anlegen" icon="add" onPress={() => openBadge()} />}>
+      action={<ActionButton label="Abzeichen anlegen" icon="add" disabled={profile?.role === 'teacher' && data.ageGroups.length === 0} onPress={() => openBadge()} />}>
       {loadError && <ErrorBanner message={loadError} onRetry={() => void refresh()} />}
       <Card style={styles.listCard}>
         {isLoading && data.badges.length === 0 ? (
@@ -110,7 +112,7 @@ export default function BadgesScreen() {
                     <Pill tone="sun">{awards.length} verliehen</Pill>
                   </View>
                   <ActionButton label="Verleihen" icon="add" compact variant="secondary" disabled={data.children.length === 0} onPress={() => openAward(badge)} />
-                  <RowActions onEdit={() => openBadge(badge)} onDelete={() => void removeBadge(badge)} />
+                  {(profile?.role === 'admin' || (badge.age_group_id !== null && data.ageGroups.some((group) => group.id === badge.age_group_id))) && <RowActions onEdit={() => openBadge(badge)} onDelete={() => void removeBadge(badge)} />}
                 </View>
               );
             })}

@@ -237,6 +237,14 @@ Zuordnung in `src/context/academy-context.tsx`:
 
 Neue Konten sind immer Elternkonten. Ein Adminprofil besitzt in `user_roles` sowohl `parent` als auch `admin`; die Adminrolle ersetzt seine Elternrolle nicht. Lehrkraft- und Adminrollen dürfen nur über eine gesicherte Adminfunktion oder direkt im Supabase-Dashboard vergeben werden. Der Bereichsschalter eines Admins ändert keine Datenbankrolle und darf nicht mit einem frei zugänglichen Rollenwechsel verwechselt werden.
 
+Lehrkräfte werden durch einen Admin genau einer Altersgruppe zugewiesen. `staff_profiles` speichert diese Zuordnung und optional den Pfad eines Team-Profilbildes. Rollenwechsel und Altersgruppenzuordnung werden atomar über `set_profile_primary_role(profile_id, role, teaching_age_group_id)` gespeichert. Name und Kontakt-E-Mail werden direkt aus dem vorhandenen Profil und Auth-Konto gelesen; keine doppelte Dozentenregistrierung und keine Kopie aller Familien-E-Mail-Adressen im Client. Bestandslehrkräfte ohne Zuordnung haben keine Inhaltsrechte, bis ein Admin die Altersgruppe zuweist.
+
+Admins können unter „Konten & Rollen“ optional ebenfalls einer Altersgruppe zugeordnet werden. Sie erscheinen dadurch für die Familien dieser Altersgruppe als Dozenten mit Bild und E-Mail-Kontakt. Die Zuordnung begrenzt ihre Adminrechte nicht: Alle Bereiche und Altersgruppen bleiben zugänglich. Nur beim Wechsel zum Elternkonto wird die Zuordnung automatisch entfernt; beim Admin kann sie über „Keine Zuordnung“ gelöscht werden.
+
+Restriktive RLS-Policies begrenzen Lehrkräfte bei Lernreisen, Lektionen, Schritten, Quizzen, Zeitgruppen, Terminen, Kindern, Lernständen und Abgaben auf ihre Altersgruppe. SECURITY-DEFINER-Funktionen prüfen dieselbe Grenze ausdrücklich. Allgemeine Akademiejahre, Altersgruppen, manuelle Inhaltsfreigaben, Zeitgruppenfreischaltungen und Lektions-PDFs bleiben Admins vorbehalten. Medien und Abzeichendefinitionen besitzen ein optionales `age_group_id`; Lehrkräfte können nur eigene altersgruppenspezifische Definitionen verändern und allgemeine Abzeichen an Kinder ihrer Altersgruppe verleihen. Mitteilungen einer Lehrkraft sind auf Zeitgruppen und Familien ihrer Altersgruppe begrenzt.
+
+Familien sehen in ihren Dashboards und Lernansichten die zugeordneten Dozenten mit Name, optionalem Bild und E-Mail-Kontaktknopf. Dieser öffnet das lokale E-Mail-Programm über `mailto:`. Der Admin lädt unter „Konten & Rollen“ Bilder für Lehrkraft- und Admin-Konten hoch, ersetzt oder entfernt sie. Der private Bucket `staff-portraits` akzeptiert JPG, PNG und WebP bis 5 MB; nur Admins schreiben, berechtigte Nutzer lesen über kurzlebige signierte URLs. Kontodaten werden bei einem Konto- oder Rollenwechsel neu geladen und alte Akademiedaten aus dem Kontext entfernt.
+
 Die Kinderansicht wird vom Elternkonto aus über ein konkretes Kinderprofil geöffnet. Es gibt bewusst keinen eigenen Kinder-Login. Beim Verlassen der Kinderansicht wechselt die App zurück in den Elternbereich. Kinder werden fachlich über `children` einem Elternprofil zugeordnet.
 
 ## 8. Supabase-Datenmodell
@@ -467,7 +475,7 @@ Grundprinzipien:
 - Eltern sehen und verändern nur ihre eigenen Kinderprofile und deren Fortschritt beziehungsweise Abgaben.
 - Eltern sehen sofort die aktiven, veröffentlichten Lernreisen der Altersgruppe; deren Lektionen und Quizze erst bei mindestens einer genehmigten Zeitgruppe des Kindes im passenden aktiven Akademiejahr.
 - Eltern sehen Zeitgruppentermine und Mitteilungen nur für freigeschaltete Zeitgruppen.
-- Lehrkräfte und Admins gelten als Akademieteam und können fachliche Inhalte verwalten.
+- Lehrkräfte verwalten ausschließlich Inhalte ihrer zugewiesenen Altersgruppe; Admins verwalten alle Altersgruppen.
 - Nur Admins dürfen Rollen verändern.
 - Die öffentliche Werbeseite liest keine geschützten Daten.
 
@@ -522,6 +530,12 @@ Aktueller relevanter Stand:
 Alle genannten Migrationen sind auf dem aktuell verknüpften Supabase-Projekt ausgeführt. Remote-Schema-Lint war danach fehlerfrei.
 
 Noch lokal anzuwenden: `20260909120000_message_read_receipts.sql` ergänzt den personenbezogenen Lesestatus für zugängliche Mitteilungen mit eigener RLS. `20260909130000_message_email_delivery.sql` ergänzt das private Brevo-Versandprotokoll und die nur serverseitig aufrufbare Empfängerermittlung.
+
+Neu lokal vorbereitet: `20261010120000_teaching_age_groups_and_portraits.sql` ergänzt Altersgruppenzuordnungen für Lehrkräfte, durchgängige Berechtigungsgrenzen, geschützte Dozentenkontakte und private Team-Profilbilder. Diese Migration muss vor Veröffentlichung des geänderten Clients auf dem Zielprojekt ausgeführt werden. Die gezielte Prüfung `supabase/tests/teaching_age_groups.sql` läuft transaktional und rollt ihre Testdaten zurück. Die vollständige Migrationskette wurde dafür in einer getrennten lokalen PostgreSQL-Testdatenbank aufgebaut.
+
+`20261010130000_fix_account_listing_and_monthly_fee.sql` korrigiert den mehrdeutigen Spaltenbezug in `list_admin_accounts()` und setzt den Monatsbeitrag serverseitig auf 1500 Cent. Bestehende aktive Vereinbarungen mit 1499 Cent sowie noch offene Sollbeträge ab dem aktuellen Monat werden angeglichen. Frühere Monate, bereits verbuchte Zahlungen und beendete Vereinbarungen behalten ihre historischen Beträge. Das Admin-Dashboard zeigt weiterhin den tatsächlich gespeicherten Betrag und berechnet daraus seine Summen.
+
+`20261010140000_admin_teaching_age_group.sql` ermöglicht eine optionale Dozentenzuordnung für Admins und erhält sie beim Speichern der Adminrolle. Die bestehenden Admin-Berechtigungen gelten weiterhin für alle Altersgruppen; die Zuordnung dient ausschließlich der Dozentenanzeige für Familien.
 
 Weitere Seeds oder fachliche Beispieldaten nur auf ausdrücklichen Auftrag anlegen.
 

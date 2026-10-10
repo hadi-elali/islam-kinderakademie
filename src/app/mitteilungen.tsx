@@ -107,7 +107,7 @@ export default function MessagesScreen() {
         : {
             subject: "",
             body: "",
-            audience: "all",
+            audience: profile?.role === "teacher" ? "group" : "all",
             recipientId: null,
             groupId: null,
             published: true,
@@ -274,8 +274,8 @@ export default function MessagesScreen() {
                           }
                         />
                       }
-                      onEdit={() => openMessage(message)}
-                      onDelete={() => void remove(message)}
+                      onEdit={profile?.role === 'admin' || message.audience !== 'all' ? () => openMessage(message) : undefined}
+                      onDelete={profile?.role === 'admin' || message.audience !== 'all' ? () => void remove(message) : undefined}
                     />
                   ) : (
                     <IconAction
@@ -327,7 +327,7 @@ export default function MessagesScreen() {
             }))
           }
           options={[
-            { value: "all", label: "Alle Familien" },
+            ...(profile?.role === "admin" ? [{ value: "all" as const, label: "Alle Familien" }] : []),
             { value: "profile", label: "Ein Profil" },
             { value: "group", label: "Eine Zeitgruppe" },
           ]}
@@ -340,7 +340,7 @@ export default function MessagesScreen() {
               setForm((current) => ({ ...current, recipientId }))
             }
             options={data.profiles
-              .filter((entry) => entry.id !== profile?.id)
+              .filter((entry) => entry.id !== profile?.id && (profile?.role === 'admin' || data.children.some((child) => child.parent_profile_id === entry.id)))
               .map((entry) => ({ value: entry.id, label: entry.display_name }))}
           />
         )}

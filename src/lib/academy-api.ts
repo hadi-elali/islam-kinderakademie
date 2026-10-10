@@ -12,6 +12,7 @@ import {
   MediaType,
   QuizEditorInput,
   QuizSubmissionResult,
+  TeachingContact,
   emptyDatabaseData,
 } from '@/types/database';
 import { supabase } from '@/lib/supabase';
@@ -64,18 +65,67 @@ export async function listAdminAccounts() {
 
   fail(error);
 
-  return (data ?? []) as AdminAccountSummary[];
+  return withStaffPortraitUrls((data ?? []) as AdminAccountSummary[]);
+}
+
+async function withStaffPortraitUrls<T extends { portrait_path: string | null }>(rows: T[]) {
+  const paths = [...new Set(rows.flatMap((row) => row.portrait_path ? [row.portrait_path] : []))];
+  if (paths.length === 0) return rows.map((row) => ({ ...row, portrait_url: null }));
+  const { data, error } = await client().storage.from('staff-portraits').createSignedUrls(paths, 3600);
+  fail(error);
+  const urls = new Map(data?.map((item) => [item.path, item.signedUrl]));
+  return rows.map((row) => ({ ...row, portrait_url: row.portrait_path ? urls.get(row.portrait_path) ?? null : null }));
+}
+
+async function listTeachingContacts(): Promise<TeachingContact[]> {
+  const { data, error } = await client().rpc('list_teaching_contacts');
+  fail(error);
+  return withStaffPortraitUrls((data ?? []) as TeachingContact[]);
+}
+
+export async function uploadStaffPortrait(input: {
+  profileId: number; mimeType: string; data: ArrayBuffer; previousPath: string | null;
+}) {
+  const extension = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }[input.mimeType];
+  if (!extension || input.data.byteLength === 0 || input.data.byteLength > 5 * 1024 * 1024) {
+    throw new AcademyApiError('Bitte wähle ein JPG-, PNG- oder WebP-Bild mit maximal 5 MB.');
+  }
+  const path = `${input.profileId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
+  const bucket = client().storage.from('staff-portraits');
+  const { error } = await bucket.upload(path, input.data, { contentType: input.mimeType, upsert: false });
+  fail(error);
+  try {
+    const { error: profileError } = await client().rpc('set_staff_portrait', {
+      target_profile_id: input.profileId, new_portrait_path: path,
+    });
+    fail(profileError);
+  } catch (reason) {
+    await bucket.remove([path]);
+    throw reason;
+  }
+  if (input.previousPath) await bucket.remove([input.previousPath]);
+}
+
+export async function removeStaffPortrait(profileId: number, path: string) {
+  const { error } = await client().rpc('set_staff_portrait', {
+    target_profile_id: profileId, new_portrait_path: null,
+  });
+  fail(error);
+  const { error: storageError } = await client().storage.from('staff-portraits').remove([path]);
+  fail(storageError);
 }
 
 export async function setProfilePrimaryRole(
   profileId: number,
-  role: 'parent' | 'teacher' | 'admin'
+  role: 'parent' | 'teacher' | 'admin',
+  ageGroupId: number | null = null
 ) {
   const { error } = await client().rpc(
     'set_profile_primary_role',
     {
       target_profile_id: profileId,
       next_role: role,
+      teaching_age_group_id: ageGroupId,
     }
   );
 
@@ -129,12 +179,13 @@ async function selectTable<T>(
   return (data ?? []) as T[];
 }
 
-export async function loadAcademyData(): Promise<AcademyData> {
+export async function loadAcademyData(account?: { id: number | null; role: string }): Promise<AcademyData> {
   if (!supabase) {
     return emptyDatabaseData;
   }
 
   const [
+    teachingContacts,
     profiles,
     userRoles,
     academyYears,
@@ -162,6 +213,7 @@ export async function loadAcademyData(): Promise<AcademyData> {
     messages,
     messageReads,
   ] = await Promise.all([
+    listTeachingContacts(),
     selectTable<AcademyData['profiles'][number]>(
       'profiles',
       'display_name'
@@ -301,10 +353,13 @@ export async function loadAcademyData(): Promise<AcademyData> {
   ]);
 
   return {
+    teachingContacts,
     profiles,
     userRoles,
     academyYears,
-    ageGroups,
+    ageGroups: account?.role === 'teacher'
+      ? ageGroups.filter((group) => group.id === teachingContacts.find((contact) => contact.profile_id === account.id)?.age_group_id)
+      : ageGroups,
     children,
     journeys,
     lessons,
@@ -989,6 +1044,7 @@ export async function saveConfirmationSubmission(
 export async function uploadMediaAsset(
   input: {
     profileId: number;
+    ageGroupId?: number | null;
     fileName: string;
     mimeType: string | null;
     size: number | null;
@@ -1045,6 +1101,7 @@ export async function uploadMediaAsset(
     return await createRecord(
       'media_assets',
       {
+        age_group_id: input.ageGroupId ?? null,
         uploaded_by_profile_id:
           input.profileId,
 

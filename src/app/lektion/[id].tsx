@@ -1,3 +1,4 @@
+import { TeachingContacts } from "@/components/teaching-contacts";
 import * as Linking from "expo-linking";
 import { Href, useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
@@ -412,6 +413,7 @@ export default function LessonDetailScreen() {
       description={lesson.description ?? undefined}
     >
       {error && <ErrorBanner message={error} onRetry={() => void refresh()} />}
+      <TeachingContacts ageGroupIds={[child.age_group_id]} />
 
       {/* ====================================================
        * FORTSCHRITT

@@ -296,7 +296,7 @@ export default function CurriculumScreen() {
       action={
         <View style={styles.headerActions}>
           {isAdmin && <ActionButton label="Altersgruppe" variant="secondary" icon="add" onPress={() => openAgeGroup()} />}
-          <ActionButton label="Akademiejahr" variant="secondary" icon="add" onPress={() => openYear()} />
+          {isAdmin && <ActionButton label="Akademiejahr" variant="secondary" icon="add" onPress={() => openYear()} />}
         </View>
       }>
       {loadError && <ErrorBanner message={loadError} onRetry={() => void refresh()} />}
@@ -336,8 +336,8 @@ export default function CurriculumScreen() {
             icon="calendar"
             title="Noch kein Akademiejahr"
             description="Lege zuerst einen Zeitraum für das Curriculum und die Unterrichtsgruppen an."
-            actionLabel="Akademiejahr anlegen"
-            onAction={() => openYear()}
+            actionLabel={isAdmin ? "Akademiejahr anlegen" : undefined}
+            onAction={isAdmin ? () => openYear() : undefined}
           />
         </Card>
       ) : (
@@ -374,7 +374,7 @@ export default function CurriculumScreen() {
                   </View>
                   <AppIcon name="arrow" size={19} color={Palette.forest} />
                 </Pressable>
-                <RowActions onEdit={() => openYear(year)} onDelete={() => void removeYear(year)} />
+                {isAdmin && <RowActions onEdit={() => openYear(year)} onDelete={() => void removeYear(year)} />}
               </Card>
             );
           })}

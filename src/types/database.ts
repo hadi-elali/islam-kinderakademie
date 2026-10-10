@@ -226,6 +226,7 @@ export type SubmissionRow = {
 
 export type BadgeRow = {
   id: number;
+  age_group_id: number | null;
   title: string;
   description: string | null;
   icon_key: string;
@@ -243,6 +244,7 @@ export type ChildBadgeRow = {
 
 export type MediaAssetRow = {
   id: number;
+  age_group_id: number | null;
   uploaded_by_profile_id: number | null;
   media_type: MediaType;
   bucket_name: string;
@@ -314,9 +316,17 @@ export type AdminAccountSummary = {
   email: string | null;
   account_role: DatabaseRole;
   profile_created_at: string;
+  age_group_id: number | null;
+  portrait_path: string | null;
+  portrait_url: string | null;
 };
 
+export type TeachingContact = Pick<AdminAccountSummary,
+  'profile_id' | 'display_name' | 'email' | 'account_role' | 'age_group_id' | 'portrait_path' | 'portrait_url'
+>;
+
 export type AcademyData = {
+  teachingContacts: TeachingContact[];
   profiles: ProfileRow[];
   userRoles: UserRoleRow[];
   academyYears: AcademyYearRow[];
@@ -346,6 +356,7 @@ export type AcademyData = {
 };
 
 export const emptyDatabaseData: AcademyData = {
+  teachingContacts: [],
   profiles: [],
   userRoles: [],
   academyYears: [],

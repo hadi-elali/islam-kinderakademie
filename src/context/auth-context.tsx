@@ -544,7 +544,7 @@ export function AuthProvider({
              * Der Preis 15,00 € wird
              * NICHT vom Client übertragen.
              * Er wird serverseitig auf
-             * 1499 Cent festgelegt.
+             * 1500 Cent festgelegt.
              */
             data: {
               display_name:

@@ -25,18 +25,26 @@ type AcademyDataContextValue = {
 const AcademyDataContext = createContext<AcademyDataContextValue | null>(null);
 
 export function AcademyDataProvider({ children }: PropsWithChildren) {
+  const { user, profile } = useAuth();
+  return <ScopedAcademyDataProvider key={`${user?.id ?? 'signed-out'}:${profile?.id ?? ''}:${profile?.role ?? ''}`}>
+    {children}
+  </ScopedAcademyDataProvider>;
+}
+
+function ScopedAcademyDataProvider({ children }: PropsWithChildren) {
   const { user, profile, isAuthenticated } = useAuth();
   const profileId = profile?.id;
+  const accountRole = profile?.role;
   const [data, setData] = useState<AcademyData>(emptyDatabaseData);
   const [isLoading, setIsLoading] = useState(isAuthenticated);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    if (!isAuthenticated || !profileId || !accountRole) return;
 
     let active = true;
-    loadAcademyData()
+    loadAcademyData({ id: profileId, role: accountRole })
       .then((nextData) => {
         if (!active) return;
         setData(nextData);
@@ -56,13 +64,13 @@ export function AcademyDataProvider({ children }: PropsWithChildren) {
     return () => {
       active = false;
     };
-  }, [isAuthenticated, profile?.role, user?.id]);
+  }, [isAuthenticated, profileId, accountRole, user?.id]);
 
   const refresh = useCallback(async () => {
     if (!isAuthenticated) return;
     setIsRefreshing(true);
     try {
-      const nextData = await loadAcademyData();
+      const nextData = await loadAcademyData(profile ?? undefined);
       setData(nextData);
       setError(null);
     } catch (reason) {
@@ -73,7 +81,7 @@ export function AcademyDataProvider({ children }: PropsWithChildren) {
     } finally {
       setIsRefreshing(false);
     }
-  }, [isAuthenticated]);
+  }, [isAuthenticated, profile]);
 
   const execute = useCallback(
     async <T,>(action: () => Promise<T>) => {

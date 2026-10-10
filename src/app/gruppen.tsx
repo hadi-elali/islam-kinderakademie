@@ -68,15 +68,10 @@ export default function GroupsScreen() {
   const [actionError, setActionError] = useState<string | null>(null);
   const isAdmin = profile?.role === "admin";
 
-  const teacherProfiles = useMemo(() => {
-    const ids = new Set(
-      data.userRoles
-        .filter((role) => role.role === "teacher" || role.role === "admin")
-        .map((role) => role.profile_id),
-    );
-
-    return data.profiles.filter((accountProfile) => ids.has(accountProfile.id));
-  }, [data.profiles, data.userRoles]);
+  const teacherProfiles = useMemo(
+    () => data.teachingContacts.filter((contact) => contact.account_role === 'admin' || contact.age_group_id === form.ageGroupId),
+    [data.teachingContacts, form.ageGroupId],
+  );
 
   const pendingRequests = data.groupMembers.filter(
     (member) => member.membership_status === "pending",
@@ -574,7 +569,7 @@ export default function GroupsScreen() {
           label="Altersgruppe und Inhalte"
           value={form.ageGroupId}
           onChange={(ageGroupId) =>
-            setForm((current) => ({ ...current, ageGroupId }))
+            setForm((current) => ({ ...current, ageGroupId, teacherProfileId: null }))
           }
           options={data.ageGroups.map((ageGroup) => ({
             value: ageGroup.id,
@@ -589,7 +584,7 @@ export default function GroupsScreen() {
             setForm((current) => ({ ...current, teacherProfileId }))
           }
           options={teacherProfiles.map((teacherProfile) => ({
-            value: teacherProfile.id,
+            value: teacherProfile.profile_id,
             label: teacherProfile.display_name,
           }))}
         />

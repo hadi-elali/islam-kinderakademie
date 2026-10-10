@@ -31,6 +31,7 @@ type AppTextProps = {
   color?: string;
   style?: StyleProp<TextStyle>;
   numberOfLines?: number;
+  selectable?: boolean;
 };
 
 export function AppText({
@@ -39,10 +40,12 @@ export function AppText({
   color = Palette.ink,
   style,
   numberOfLines,
+  selectable,
 }: AppTextProps) {
   return (
     <Text
       numberOfLines={numberOfLines}
+      selectable={selectable}
       style={[textStyles.base, textStyles[variant], { color }, style]}
     >
       {children}
