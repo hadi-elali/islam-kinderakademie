@@ -142,7 +142,7 @@ export default function AccountScreen() {
         await updateRecord("profiles", profile.id!, {
           display_name: name.trim(),
         });
-      });
+      }, ['profiles', 'teachingContacts']);
 
       await refreshProfile();
 

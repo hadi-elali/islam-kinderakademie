@@ -38,7 +38,7 @@ export default function SubmissionsScreen() {
     if (!confirmed) return;
     setActionError(null);
     try {
-      await execute(() => deleteRecord('submissions', id));
+      await execute(() => deleteRecord('submissions', id), ['submissions']);
     } catch (reason) {
       setActionError(apiErrorMessage(reason));
     }
@@ -49,7 +49,7 @@ export default function SubmissionsScreen() {
     if (!confirmed) return;
     setActionError(null);
     try {
-      await execute(() => deleteRecord('quiz_attempts', id));
+      await execute(() => deleteRecord('quiz_attempts', id), ['quizAttempts']);
     } catch (reason) {
       setActionError(apiErrorMessage(reason));
     }

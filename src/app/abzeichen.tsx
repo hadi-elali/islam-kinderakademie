@@ -52,7 +52,7 @@ export default function BadgesScreen() {
     setSaving(true);
     try {
       const values = { age_group_id: profile?.role === 'teacher' ? data.ageGroups[0]?.id ?? null : editing?.age_group_id ?? null, title: title.trim(), description: description.trim() || null, icon_key: iconKey.trim() };
-      await execute(() => editing ? updateRecord('badges', editing.id, values) : createRecord('badges', values));
+      await execute(() => editing ? updateRecord('badges', editing.id, values) : createRecord('badges', values), ['badges']);
       setBadgeDialog(false);
     } catch (reason) {
       setFormError(apiErrorMessage(reason));
@@ -73,7 +73,7 @@ export default function BadgesScreen() {
         badge_id: selectedBadge.id,
         lesson_id: lessonId,
         awarded_at: new Date().toISOString(),
-      }));
+      }), ['childBadges']);
       setAwardDialog(false);
     } catch (reason) {
       setFormError(apiErrorMessage(reason));
@@ -84,7 +84,7 @@ export default function BadgesScreen() {
 
   async function removeBadge(badge: BadgeRow) {
     const confirmed = await confirmAction('Abzeichen löschen?', `„${badge.title}“ wird auch aus allen Kinderpässen entfernt.`);
-    if (confirmed) await execute(() => deleteRecord('badges', badge.id));
+    if (confirmed) await execute(() => deleteRecord('badges', badge.id), ['badges', 'childBadges']);
   }
 
   return (

@@ -38,7 +38,6 @@ import { useAuth } from '@/context/auth-context';
 import {
   deleteRecord,
   deleteLessonPdf,
-  getMediaSignedUrl,
   saveLesson,
   setLessonRelease,
   uploadLessonPdf,
@@ -185,7 +184,7 @@ function LessonEditor({
     width <
     Layout.contentStackBreakpoint;
 
-  const { execute } =
+  const { execute, getMediaUrl } =
     useAcademyData();
 
   const { profile } =
@@ -647,7 +646,7 @@ function LessonEditor({
         setLessonRelease(
           initialLesson.id,
           !initialLesson.is_released,
-        ),
+        ), ['lessons', 'quizzes'],
       );
     } catch (reason) {
       setFormError(
@@ -717,7 +716,7 @@ function LessonEditor({
           size: pickedFile.size ?? null,
           data: fileData,
           position: nextPosition,
-        }),
+        }), ['mediaAssets', 'lessonDocuments'],
       );
     } catch (reason) {
       setFormError(apiErrorMessage(reason));
@@ -737,7 +736,7 @@ function LessonEditor({
     }
 
     try {
-      const url = await getMediaSignedUrl(asset);
+      const url = await getMediaUrl(asset);
       if (url) {
         await Linking.openURL(url);
       }
@@ -767,7 +766,7 @@ function LessonEditor({
     setFormError(null);
 
     try {
-      await execute(() => deleteLessonPdf(document, asset));
+      await execute(() => deleteLessonPdf(document, asset), ['mediaAssets', 'lessonDocuments']);
     } catch (reason) {
       setFormError(apiErrorMessage(reason));
     } finally {

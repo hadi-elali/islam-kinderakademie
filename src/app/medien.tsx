@@ -9,7 +9,7 @@ import { ActionButton, AppText, Card, EmptyState, PageScaffold, Pill } from '@/c
 import { Palette, Radius, Space } from '@/constants/design';
 import { useAcademyData } from '@/context/academy-data-context';
 import { useAuth } from '@/context/auth-context';
-import { deleteMediaAsset, getMediaSignedUrl, uploadMediaAsset } from '@/lib/academy-api';
+import { deleteMediaAsset, uploadMediaAsset } from '@/lib/academy-api';
 import { MediaAssetRow, MediaType } from '@/types/database';
 import { confirmAction } from '@/utils/feedback';
 import { apiErrorMessage, formatBytes, formatDate } from '@/utils/format';
@@ -18,7 +18,7 @@ type MediaFilter = 'all' | MediaType;
 
 export default function MediaScreen() {
   const { profile } = useAuth();
-  const { data, isLoading, error: loadError, refresh, execute } = useAcademyData();
+  const { data, isLoading, error: loadError, refresh, execute, getMediaUrl } = useAcademyData();
   const [filter, setFilter] = useState<MediaFilter>('all');
   const [uploading, setUploading] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -54,7 +54,7 @@ export default function MediaScreen() {
           mimeType: asset.mimeType ?? null,
           size: asset.size ?? null,
           data: fileData,
-        })
+        }), ['mediaAssets']
       );
     } catch (reason) {
       setActionError(apiErrorMessage(reason));
@@ -65,7 +65,7 @@ export default function MediaScreen() {
 
   async function openAsset(asset: MediaAssetRow) {
     try {
-      const url = await getMediaSignedUrl(asset);
+      const url = await getMediaUrl(asset);
       if (url) await Linking.openURL(url);
     } catch (reason) {
       setActionError(apiErrorMessage(reason));
@@ -84,7 +84,7 @@ export default function MediaScreen() {
     );
     if (!confirmed) return;
     try {
-      await execute(() => deleteMediaAsset(asset));
+      await execute(() => deleteMediaAsset(asset), ['mediaAssets', 'lessonDocuments']);
     } catch (reason) {
       setActionError(apiErrorMessage(reason));
     }

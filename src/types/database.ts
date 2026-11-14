@@ -334,7 +334,7 @@ export type AcademyData = {
   children: ChildRow[];
   journeys: LearningJourneyRow[];
   lessons: LessonRow[];
-  lessonSteps: LessonStepRow[];
+  lessonSteps: Omit<LessonStepRow, 'content'>[];
   groups: GroupRow[];
   groupMembers: GroupMemberRow[];
   liveSessions: LiveSessionRow[];

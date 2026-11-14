@@ -20,7 +20,6 @@ import {
 import { Layout, Palette, Radius, Space } from "@/constants/design";
 import { useAcademy } from "@/context/academy-context";
 import { useAcademyData } from "@/context/academy-data-context";
-import { getMediaSignedUrl } from "@/lib/academy-api";
 import { apiErrorMessage, formatDateTime } from "@/utils/format";
 import { findActiveTimeGroupForChild } from "@/utils/time-group-access";
 
@@ -134,7 +133,7 @@ export default function LessonDetailScreen() {
 
   const { selectedChildId } = useAcademy();
 
-  const { data, isLoading, error, refresh } = useAcademyData();
+  const { data, isLoading, error, refresh, getMediaUrl } = useAcademyData();
 
   /*
    * Breite des YouTube-Containers.
@@ -223,7 +222,7 @@ export default function LessonDetailScreen() {
       };
     }
 
-    void getMediaSignedUrl(selectedPdfAsset)
+    void getMediaUrl(selectedPdfAsset)
       .then((url) => {
         if (!active) {
           return;
@@ -252,7 +251,7 @@ export default function LessonDetailScreen() {
     return () => {
       active = false;
     };
-  }, [selectedPdfAsset]);
+  }, [selectedPdfAsset, getMediaUrl]);
 
   async function openSelectedPdf() {
     if (!selectedPdfAsset) {
@@ -266,7 +265,7 @@ export default function LessonDetailScreen() {
     );
 
     try {
-      const url = await getMediaSignedUrl(selectedPdfAsset);
+      const url = await getMediaUrl(selectedPdfAsset);
       if (url) {
         await Linking.openURL(url);
       }

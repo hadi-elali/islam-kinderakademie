@@ -169,7 +169,7 @@ export default function LessonsScreen() {
     setReleaseAction(actionKey);
     setActionError(null);
     try {
-      await execute(() => setLessonRelease(lesson.id, !lesson.is_released));
+      await execute(() => setLessonRelease(lesson.id, !lesson.is_released), ['lessons', 'quizzes']);
     } catch (reason) {
       setActionError(apiErrorMessage(reason));
     } finally {
@@ -190,7 +190,7 @@ export default function LessonsScreen() {
     setReleaseAction(actionKey);
     setActionError(null);
     try {
-      await execute(() => setQuizRelease(quizId, !isReleased));
+      await execute(() => setQuizRelease(quizId, !isReleased), ['quizzes']);
     } catch (reason) {
       setActionError(apiErrorMessage(reason));
     } finally {
@@ -225,7 +225,7 @@ export default function LessonsScreen() {
     setActionError(null);
     try {
       await execute(() =>
-        Promise.all(releasableLessons.map((lesson) => setLessonRelease(lesson.id, true)))
+        Promise.all(releasableLessons.map((lesson) => setLessonRelease(lesson.id, true))), ['lessons', 'quizzes']
       );
     } catch (reason) {
       setActionError(apiErrorMessage(reason));

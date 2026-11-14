@@ -16,6 +16,9 @@ import {
   emptyDatabaseData,
 } from '@/types/database';
 import { supabase } from '@/lib/supabase';
+import { SignedUrlCache } from '@/lib/signed-url-cache';
+import { academySources, AcademyDataKey, initialAcademyKeys } from '@/lib/academy-sources';
+import { prepareStaffPortrait } from '@/lib/prepare-staff-portrait';
 
 export class AcademyApiError extends Error {
   constructor(message: string) {
@@ -58,41 +61,50 @@ export async function ensureCurrentProfileId() {
   return profileId;
 }
 
-export async function listAdminAccounts() {
-  const { data, error } = await client().rpc(
-    'list_admin_accounts'
-  );
-
+export async function listAdminAccounts(signedUrls?: SignedUrlCache) {
+  const { data, error } = await client().rpc('list_admin_accounts');
   fail(error);
-
-  return withStaffPortraitUrls((data ?? []) as AdminAccountSummary[]);
+  return withStaffPortraitUrls((data ?? []) as AdminAccountSummary[], signedUrls);
 }
 
-async function withStaffPortraitUrls<T extends { portrait_path: string | null }>(rows: T[]) {
+async function withStaffPortraitUrls<T extends { portrait_path: string | null }>(
+  rows: T[], signedUrls = new SignedUrlCache()
+) {
   const paths = [...new Set(rows.flatMap((row) => row.portrait_path ? [row.portrait_path] : []))];
-  if (paths.length === 0) return rows.map((row) => ({ ...row, portrait_url: null }));
-  const { data, error } = await client().storage.from('staff-portraits').createSignedUrls(paths, 3600);
-  fail(error);
-  const urls = new Map(data?.map((item) => [item.path, item.signedUrl]));
-  return rows.map((row) => ({ ...row, portrait_url: row.portrait_path ? urls.get(row.portrait_path) ?? null : null }));
+  let signing: Promise<Map<string | null, string | null>> | undefined;
+  const urls = new Map(await Promise.all(paths.map(async (path) => [
+    path,
+    await signedUrls.get('staff-portraits', path, 3600, async () => {
+      // Keep batch signing: one request even when several portraits are missing.
+      signing ??= (async () => {
+        const { data, error } = await client().storage.from('staff-portraits').createSignedUrls(paths, 3600);
+        fail(error);
+        return new Map((data ?? []).map((item) => [item.path, item.signedUrl]));
+      })();
+      return (await signing).get(path) ?? '';
+    }),
+  ] as const)));
+  return rows.map((row) => ({ ...row, portrait_url: row.portrait_path ? urls.get(row.portrait_path) || null : null }));
 }
 
-async function listTeachingContacts(): Promise<TeachingContact[]> {
+async function listTeachingContacts(signedUrls?: SignedUrlCache): Promise<TeachingContact[]> {
   const { data, error } = await client().rpc('list_teaching_contacts');
   fail(error);
-  return withStaffPortraitUrls((data ?? []) as TeachingContact[]);
+  return withStaffPortraitUrls((data ?? []) as TeachingContact[], signedUrls);
 }
 
 export async function uploadStaffPortrait(input: {
   profileId: number; mimeType: string; data: ArrayBuffer; previousPath: string | null;
 }) {
-  const extension = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' }[input.mimeType];
-  if (!extension || input.data.byteLength === 0 || input.data.byteLength > 5 * 1024 * 1024) {
+  const extensions: Record<string, string> = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp' };
+  if (!extensions[input.mimeType] || input.data.byteLength === 0 || input.data.byteLength > 5 * 1024 * 1024) {
     throw new AcademyApiError('Bitte wähle ein JPG-, PNG- oder WebP-Bild mit maximal 5 MB.');
   }
+  const portrait = await prepareStaffPortrait(input.data, input.mimeType);
+  const extension = extensions[portrait.mimeType];
   const path = `${input.profileId}/${Date.now()}-${Math.random().toString(36).slice(2)}.${extension}`;
   const bucket = client().storage.from('staff-portraits');
-  const { error } = await bucket.upload(path, input.data, { contentType: input.mimeType, upsert: false });
+  const { error } = await bucket.upload(path, portrait.data, { contentType: portrait.mimeType, upsert: false });
   fail(error);
   try {
     const { error: profileError } = await client().rpc('set_staff_portrait', {
@@ -162,227 +174,37 @@ export async function setQuizRelease(
   fail(error);
 }
 
-async function selectTable<T>(
-  table: AcademyTableName,
-  order: string,
-  ascending = true
-) {
-  const { data, error } = await client()
-    .from(table)
-    .select('*')
-    .order(order, {
-      ascending,
-    });
+export async function loadAcademyData(
+  account?: { id: number | null; role: string },
+  options: { keys?: readonly AcademyDataKey[]; signedUrls?: SignedUrlCache } = {}
+): Promise<Partial<AcademyData>> {
+  if (!supabase) return options.keys ? {} : emptyDatabaseData;
 
-  fail(error);
-
-  return (data ?? []) as T[];
-}
-
-export async function loadAcademyData(account?: { id: number | null; role: string }): Promise<AcademyData> {
-  if (!supabase) {
-    return emptyDatabaseData;
+  const keys = [...new Set(options.keys ?? initialAcademyKeys)];
+  const entries = await Promise.all(keys.map(async (key) => {
+    if (key === 'teachingContacts') {
+      return [key, await listTeachingContacts(options.signedUrls)] as const;
+    }
+    // Results for an individual attempt are already returned by the review RPC.
+    // No screen consumes the full history of individual attempt answers.
+    if (key === 'quizAttemptAnswers' || (key === 'quizAnswerKeys' && account?.role === 'parent')) {
+      return [key, []] as const;
+    }
+    const source = academySources[key];
+    const { data, error } = await client().from(source.table).select(source.columns)
+      .order(source.order, { ascending: 'ascending' in source ? source.ascending : true });
+    fail(error);
+    return [key, data ?? []] as const;
+  }));
+  const result = Object.fromEntries(entries) as Partial<AcademyData>;
+  if (account?.role === 'teacher' && result.ageGroups) {
+    // Also reload contacts when requesting age groups without the other data.
+    const contacts = result.teachingContacts ?? await listTeachingContacts(options.signedUrls);
+    result.ageGroups = result.ageGroups.filter((group) => group.id === contacts.find(
+      (contact) => contact.profile_id === account.id
+    )?.age_group_id);
   }
-
-  const [
-    teachingContacts,
-    profiles,
-    userRoles,
-    academyYears,
-    ageGroups,
-    children,
-    journeys,
-    lessons,
-    lessonSteps,
-    groups,
-    groupMembers,
-    liveSessions,
-    quizzes,
-    quizQuestions,
-    quizOptions,
-    quizAnswerKeys,
-    quizAttempts,
-    quizAttemptAnswers,
-    lessonProgress,
-    stepProgress,
-    submissions,
-    badges,
-    childBadges,
-    mediaAssets,
-    lessonDocuments,
-    messages,
-    messageReads,
-  ] = await Promise.all([
-    listTeachingContacts(),
-    selectTable<AcademyData['profiles'][number]>(
-      'profiles',
-      'display_name'
-    ),
-
-    selectTable<AcademyData['userRoles'][number]>(
-      'user_roles',
-      'created_at'
-    ),
-
-    selectTable<AcademyData['academyYears'][number]>(
-      'academy_years',
-      'starts_on',
-      false
-    ),
-
-    selectTable<AcademyData['ageGroups'][number]>(
-      'age_groups',
-      'position'
-    ),
-
-    selectTable<AcademyData['children'][number]>(
-      'children',
-      'display_name'
-    ),
-
-    selectTable<AcademyData['journeys'][number]>(
-      'learning_journeys',
-      'position'
-    ),
-
-    selectTable<AcademyData['lessons'][number]>(
-      'lessons',
-      'position'
-    ),
-
-    selectTable<AcademyData['lessonSteps'][number]>(
-      'lesson_steps',
-      'position'
-    ),
-
-    selectTable<AcademyData['groups'][number]>(
-      'groups',
-      'name'
-    ),
-
-    selectTable<AcademyData['groupMembers'][number]>(
-      'group_members',
-      'created_at'
-    ),
-
-    selectTable<AcademyData['liveSessions'][number]>(
-      'live_sessions',
-      'starts_at'
-    ),
-
-    selectTable<AcademyData['quizzes'][number]>(
-      'lesson_quizzes',
-      'created_at'
-    ),
-
-    selectTable<AcademyData['quizQuestions'][number]>(
-      'quiz_questions',
-      'position'
-    ),
-
-    selectTable<AcademyData['quizOptions'][number]>(
-      'quiz_options',
-      'position'
-    ),
-
-    selectTable<AcademyData['quizAnswerKeys'][number]>(
-      'quiz_answer_keys',
-      'created_at'
-    ),
-
-    selectTable<AcademyData['quizAttempts'][number]>(
-      'quiz_attempts',
-      'submitted_at',
-      false
-    ),
-
-    selectTable<AcademyData['quizAttemptAnswers'][number]>(
-      'quiz_attempt_answers',
-      'created_at'
-    ),
-
-    selectTable<AcademyData['lessonProgress'][number]>(
-      'child_lesson_progress',
-      'created_at'
-    ),
-
-    selectTable<AcademyData['stepProgress'][number]>(
-      'child_step_progress',
-      'created_at'
-    ),
-
-    selectTable<AcademyData['submissions'][number]>(
-      'submissions',
-      'submitted_at',
-      false
-    ),
-
-    selectTable<AcademyData['badges'][number]>(
-      'badges',
-      'title'
-    ),
-
-    selectTable<AcademyData['childBadges'][number]>(
-      'child_badges',
-      'awarded_at',
-      false
-    ),
-
-    selectTable<AcademyData['mediaAssets'][number]>(
-      'media_assets',
-      'created_at',
-      false
-    ),
-
-    selectTable<AcademyData['lessonDocuments'][number]>(
-      'lesson_documents',
-      'position'
-    ),
-
-    selectTable<AcademyData['messages'][number]>(
-      'messages',
-      'created_at',
-      false
-    ),
-
-    selectTable<AcademyData['messageReads'][number]>(
-      'message_reads',
-      'read_at',
-      false
-    ),
-  ]);
-
-  return {
-    teachingContacts,
-    profiles,
-    userRoles,
-    academyYears,
-    ageGroups: account?.role === 'teacher'
-      ? ageGroups.filter((group) => group.id === teachingContacts.find((contact) => contact.profile_id === account.id)?.age_group_id)
-      : ageGroups,
-    children,
-    journeys,
-    lessons,
-    lessonSteps,
-    groups,
-    groupMembers,
-    liveSessions,
-    quizzes,
-    quizQuestions,
-    quizOptions,
-    quizAnswerKeys,
-    quizAttempts,
-    quizAttemptAnswers,
-    lessonProgress,
-    stepProgress,
-    submissions,
-    badges,
-    childBadges,
-    mediaAssets,
-    lessonDocuments,
-    messages,
-    messageReads,
-  };
+  return result;
 }
 
 export async function markMessageRead(
@@ -1138,26 +960,14 @@ export async function uploadMediaAsset(
   }
 }
 
-export async function getMediaSignedUrl(
-  asset: MediaAssetRow
-) {
-  const {
-    data,
-    error,
-  } = await client()
-    .storage
-    .from(
-      asset.bucket_name
-    )
-    .createSignedUrl(
-      asset.storage_path,
-      60 * 10
-    );
-
-  fail(error);
-
-  return data?.signedUrl ??
-    null;
+export async function getMediaSignedUrl(asset: MediaAssetRow, signedUrls = new SignedUrlCache()) {
+  return signedUrls.get(asset.bucket_name, asset.storage_path, 600, async () => {
+    const { data, error } = await client().storage.from(asset.bucket_name)
+      .createSignedUrl(asset.storage_path, 600);
+    fail(error);
+    if (!data?.signedUrl) throw new AcademyApiError('Die Datei-Adresse konnte nicht erstellt werden.');
+    return data.signedUrl;
+  });
 }
 
 export async function deleteMediaAsset(

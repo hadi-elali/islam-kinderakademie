@@ -5,11 +5,15 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 
-import { loadAcademyData, markMessageRead } from '@/lib/academy-api';
-import { AcademyData, emptyDatabaseData } from '@/types/database';
+import { getMediaSignedUrl, loadAcademyData, markMessageRead } from '@/lib/academy-api';
+import { AcademyDataKey, deferredAcademyDependencies, initialAcademyKeys } from '@/lib/academy-sources';
+import { SignedUrlCache } from '@/lib/signed-url-cache';
+import { createAcademyDataLoader } from '@/lib/academy-data-loader';
+import { AcademyData, MediaAssetRow, emptyDatabaseData } from '@/types/database';
 import { useAuth } from '@/context/auth-context';
 
 type AcademyDataContextValue = {
@@ -18,7 +22,11 @@ type AcademyDataContextValue = {
   isRefreshing: boolean;
   error: string | null;
   refresh: () => Promise<void>;
-  execute: <T>(action: () => Promise<T>) => Promise<T>;
+  execute: <T>(action: () => Promise<T>, changedKeys?: readonly AcademyDataKey[]) => Promise<T>;
+  getMediaUrl: (asset: MediaAssetRow) => Promise<string>;
+  signedUrls: SignedUrlCache;
+  loadedKeys: ReadonlySet<AcademyDataKey>;
+  ensureData: (keys: readonly AcademyDataKey[]) => Promise<void>;
   markMessageAsRead: (messageId: number) => Promise<void>;
 };
 
@@ -32,65 +40,82 @@ export function AcademyDataProvider({ children }: PropsWithChildren) {
 }
 
 function ScopedAcademyDataProvider({ children }: PropsWithChildren) {
-  const { user, profile, isAuthenticated } = useAuth();
+  const { profile, isAuthenticated } = useAuth();
   const profileId = profile?.id;
   const accountRole = profile?.role;
   const [data, setData] = useState<AcademyData>(emptyDatabaseData);
-  const [isLoading, setIsLoading] = useState(isAuthenticated);
+  const [isLoading, setIsLoading] = useState(isAuthenticated && Boolean(profileId));
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!isAuthenticated || !profileId || !accountRole) return;
+  const [loadedKeys, setLoadedKeys] = useState<ReadonlySet<AcademyDataKey>>(() => new Set());
+  const active = useRef(false);
+  const [signedUrls] = useState(() => new SignedUrlCache());
 
-    let active = true;
-    loadAcademyData({ id: profileId, role: accountRole })
-      .then((nextData) => {
-        if (!active) return;
-        setData(nextData);
+  const ensureRequest = useRef<((keys: readonly AcademyDataKey[]) => Promise<void>) | null>(null);
+  const ensureData = useCallback((keys: readonly AcademyDataKey[]) =>
+    ensureRequest.current?.(keys) ?? Promise.resolve(), []);
+  const refreshRequest = useRef<((keys?: readonly AcademyDataKey[]) => Promise<void>) | null>(null);
+  const refreshSelected = useCallback((keys?: readonly AcademyDataKey[]) =>
+    refreshRequest.current?.(keys) ?? Promise.resolve(), []);
+  const refresh = useCallback(() => refreshSelected(), [refreshSelected]);
+
+  useEffect(() => {
+    let current = true;
+    active.current = true;
+    const loader = createAcademyDataLoader<AcademyDataKey>(initialAcademyKeys, async (keys, full) => {
+      if (!current || !isAuthenticated || !profileId || !accountRole) return;
+      setIsRefreshing(true);
+      // Explicit refreshes and changes to permissions recheck private URL access.
+      if (full) signedUrls.clear();
+      try {
+        const nextData = await loadAcademyData({ id: profileId, role: accountRole }, { keys, signedUrls });
+        if (!current) return;
+        setData((previous) => ({ ...(full ? emptyDatabaseData : previous), ...nextData }));
+        setLoadedKeys((previous) => new Set([...previous, ...keys]));
         setError(null);
-      })
-      .catch((reason: unknown) => {
-        if (!active) return;
-        setError(reason instanceof Error ? reason.message : 'Die Akademiedaten konnten nicht geladen werden.');
-      })
-      .finally(() => {
-        if (active) {
+      } catch (reason) {
+        if (current) {
+          setError(reason instanceof Error ? reason.message : 'Die Akademiedaten konnten nicht geladen werden.');
+        }
+        throw reason;
+      } finally {
+        if (current) {
           setIsLoading(false);
           setIsRefreshing(false);
         }
-      });
-
-    return () => {
-      active = false;
-    };
-  }, [isAuthenticated, profileId, accountRole, user?.id]);
-
-  const refresh = useCallback(async () => {
-    if (!isAuthenticated) return;
-    setIsRefreshing(true);
-    try {
-      const nextData = await loadAcademyData(profile ?? undefined);
-      setData(nextData);
-      setError(null);
-    } catch (reason) {
-      const message =
-        reason instanceof Error ? reason.message : 'Die Akademiedaten konnten nicht geladen werden.';
-      setError(message);
-      throw reason;
-    } finally {
-      setIsRefreshing(false);
+      }
+    }, deferredAcademyDependencies);
+    refreshRequest.current = loader.refresh;
+    ensureRequest.current = loader.ensure;
+    if (isAuthenticated && profileId && accountRole) {
+      void loader.refresh().catch(() => { /* The error is shown by the existing banners. */ });
     }
-  }, [isAuthenticated, profile]);
+    return () => {
+      current = false;
+      active.current = false;
+      refreshRequest.current = null;
+      ensureRequest.current = null;
+      signedUrls.clear();
+    };
+  }, [isAuthenticated, profileId, accountRole, signedUrls]);
 
   const execute = useCallback(
-    async <T,>(action: () => Promise<T>) => {
+    async <T,>(action: () => Promise<T>, changedKeys?: readonly AcademyDataKey[]) => {
       const result = await action();
-      await refresh();
+      // Omit changedKeys for role/group/access changes and complex cascades.
+      await refreshSelected(changedKeys);
       return result;
     },
-    [refresh]
+    [refreshSelected]
   );
+
+  const getMediaUrl = useCallback((asset: MediaAssetRow) => {
+    if (!active.current || !isAuthenticated || !profileId) {
+      return Promise.reject(new Error('Bitte melde dich erneut an.'));
+    }
+    return getMediaSignedUrl(asset, signedUrls);
+  }, [isAuthenticated, profileId, signedUrls]);
 
   const markMessageAsRead = useCallback(
     async (messageId: number) => {
@@ -121,6 +146,10 @@ function ScopedAcademyDataProvider({ children }: PropsWithChildren) {
       refresh,
       execute,
       markMessageAsRead,
+      getMediaUrl,
+      signedUrls,
+      loadedKeys,
+      ensureData,
     }),
     [
       data,
@@ -129,6 +158,10 @@ function ScopedAcademyDataProvider({ children }: PropsWithChildren) {
       isLoading,
       isRefreshing,
       markMessageAsRead,
+      getMediaUrl,
+      signedUrls,
+      loadedKeys,
+      ensureData,
       refresh,
     ]
   );
@@ -136,8 +169,20 @@ function ScopedAcademyDataProvider({ children }: PropsWithChildren) {
   return <AcademyDataContext.Provider value={value}>{children}</AcademyDataContext.Provider>;
 }
 
-export function useAcademyData() {
+export function useAcademyData(requiredKeys: readonly AcademyDataKey[] = []) {
   const context = useContext(AcademyDataContext);
   if (!context) throw new Error('useAcademyData must be used inside AcademyDataProvider');
-  return context;
+  const { ensureData, loadedKeys } = context;
+  // A primitive dependency avoids repeating work for inline key arrays.
+  const signature = [...new Set(requiredKeys)].sort().join(',');
+  useEffect(() => {
+    // Wait for the base data. A later successful optional read must not hide
+    // an initial loading failure and leave the page without its lesson data.
+    if (!signature || context.isLoading || context.error) return;
+    void ensureData(signature.split(',') as AcademyDataKey[]).catch(() => {
+      // The existing context error banners expose a retry action.
+    });
+  }, [ensureData, loadedKeys, signature, context.isLoading, context.error]);
+  const isReady = requiredKeys.every((key) => loadedKeys.has(key));
+  return { ...context, isReady, isLoading: context.isLoading || (!isReady && !context.error) };
 }

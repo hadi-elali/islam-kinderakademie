@@ -37,6 +37,9 @@ jobs:
       - name: TypeScript pruefen
         run: npx tsc --noEmit
 
+      - name: Supabase-Egress-Regressionen pruefen
+        run: node --test scripts/egress.test.mjs
+
       - name: Lint pruefen
         run: npm run lint
 
@@ -54,6 +57,7 @@ jobs:
           set -euo pipefail
           test -f dist/index.html
           test -f dist/.htaccess
+          node -e "require('node:fs').writeFileSync('dist/release.json', JSON.stringify({commit: process.env.GITHUB_SHA}) + '\n')"
           if grep -R "/islam-kinderakademie/" dist --include="*.html" --include="*.js"; then
             echo "Der alte GitHub-Pages-Unterpfad ist noch im Build enthalten."
             exit 1
@@ -100,3 +104,5 @@ jobs:
           set -euo pipefail
           curl --fail --silent --show-error --retry 5 --retry-delay 5 https://www.bufib-kinder.de/ > /dev/null
           curl --fail --silent --show-error --retry 5 --retry-delay 5 https://www.bufib-kinder.de/login > /dev/null
+          curl --fail --silent --show-error --retry 5 --retry-delay 5 "https://www.bufib-kinder.de/release.json?commit=${GITHUB_SHA}" > /tmp/ika-release.json
+          node -e "if (JSON.parse(require('node:fs').readFileSync('/tmp/ika-release.json', 'utf8')).commit !== process.env.GITHUB_SHA) process.exit(1)"

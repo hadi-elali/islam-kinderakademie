@@ -220,7 +220,7 @@ export default function CalendarScreen() {
       await execute(() =>
         editing
           ? updateRecord('live_sessions', editing.id, values)
-          : createRecord('live_sessions', values)
+          : createRecord('live_sessions', values), ['liveSessions']
       );
       setDialogOpen(false);
     } catch (reason) {
@@ -232,7 +232,7 @@ export default function CalendarScreen() {
 
   async function remove(session: LiveSessionRow) {
     const confirmed = await confirmAction('Termin löschen?', 'Der Live-Termin wird dauerhaft aus dem Kalender entfernt.');
-    if (confirmed) await execute(() => deleteRecord('live_sessions', session.id));
+    if (confirmed) await execute(() => deleteRecord('live_sessions', session.id), ['liveSessions']);
   }
 
   return (

@@ -148,7 +148,7 @@ export default function MessagesScreen() {
       await execute(() =>
         editing
           ? updateRecord("messages", editing.id, values)
-          : createRecord("messages", values),
+          : createRecord("messages", values), ['messages', 'messageReads'],
       );
       setDialogOpen(false);
     } catch (reason) {
@@ -163,7 +163,7 @@ export default function MessagesScreen() {
       "Mitteilung löschen?",
       `„${message.subject}“ wird dauerhaft gelöscht.`,
     );
-    if (confirmed) await execute(() => deleteRecord("messages", message.id));
+    if (confirmed) await execute(() => deleteRecord("messages", message.id), ['messages', 'messageReads']);
   }
 
   return (

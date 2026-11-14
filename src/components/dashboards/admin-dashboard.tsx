@@ -450,7 +450,7 @@ export function AdminDashboard() {
     setQuizActionError(null);
 
     try {
-      await execute(() => setQuizRelease(quizId, !isReleased));
+      await execute(() => setQuizRelease(quizId, !isReleased), ['quizzes']);
     } catch (reason) {
       setQuizActionError(apiErrorMessage(reason));
     } finally {

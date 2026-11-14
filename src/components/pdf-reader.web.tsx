@@ -20,6 +20,7 @@ export default function PdfReader({
     <View style={[styles.frame, { height }]}>
       {React.createElement('iframe', {
         src: sourceUrl,
+        loading: 'lazy',
         title,
         onError,
         style: {

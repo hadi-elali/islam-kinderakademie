@@ -19,10 +19,10 @@ Das Projekt ist eine funktionierende Supabase-gestützte Lernplattform. Als fach
 
 ## 2. Technischer Stack
 
-- Expo `~57.0.16`
-- Expo Router `~57.0.16`
+- Expo `~57.0.33`
+- Expo Router `~57.0.31`
 - React `19.2.3`
-- React Native `0.86.2`
+- React Native `0.86.3`
 - React Native Web `~0.21.0`
 - Node.js `24` empfohlen; Expo 57 und Metro 0.84 benötigen mindestens eine unterstützte Version ab Node `22.13.x`. Node 23 ist nicht unterstützt.
 - TypeScript mit aktiviertem Strict Mode
@@ -52,12 +52,14 @@ npm audit --omit=dev
 
 ### Abhängigkeitssicherheit und Release-Audit
 
-`npm audit` zählt einen einzelnen transitiven Befund für jedes davon abhängige Paket erneut. Die am 25. August 2026 ermittelte Ausgangslage von 20 Einträgen besteht deshalb nicht aus 20 unabhängigen Schwachstellen, sondern aus zwei Ursachen:
+`npm audit` zählt einen einzelnen transitiven Befund für jedes davon abhängige Paket erneut. Die Release-Prüfung vom 15. November 2026 enthält nach kompatiblen Expo-57-/Tooling-Updates sechs Folgeeinträge aus zwei Paketursachen:
 
-- Acht hohe Folgeeinträge entstehen durch `image-size@1.2.1` unter Metro `0.84.4`. Die beiden Advisories `GHSA-w3rx-r6r6-pgpr` und `GHSA-5p2g-fcmc-qvqq` betreffen Endlosschleifen beim Parsen präparierter ICNS-, JXL- oder HEIF-Dateien. Der Pfad gehört zum Build-Tooling und nicht zum ausgelieferten App-Bundle.
-- Zwölf moderate Folgeeinträge entstehen durch `uuid@7.0.3` unter `@expo/config-plugins -> xcode@3.0.1`. `GHSA-w5hq-g745-h8pq` betrifft nur `uuid.v3()`, `v5()` und `v6()` mit übergebenem Buffer; das installierte `xcode` verwendet ausschließlich `uuid.v4()`.
+- Drei hohe Folgeeinträge: `expo-router -> query-string@7.1.3 -> decode-uri-component@0.2.2`, Advisories `GHSA-vcc3-ghjq-m6fr` und `GHSA-qr28-fpjm-wq7f`. Präparierte Prozentcodierung kann auch im Browser einen Tab blockieren. Produktion ist statisch bei OVH, kein öffentlicher Node-Requesthandler; der Befund ist trotzdem nicht ausschließlich Build-only. Die gepatchte Version 0.5.1 ist ESM und kein kompatibler CommonJS-Ersatz. Keinen ungeprüften Override oder Router-58-/SDK-Majorwechsel durchführen.
+- Drei moderate Folgeeinträge: `minimatch@10.2.6` im Expo-Fingerprint-/TypeScript-ESLint-Tooling, `GHSA-g3hv-75wg-m249`. Hier werden nur vertrauenswürdige lokale Dateimuster im Build verarbeitet. Kein pauschaler Major-Override oder Expo-Downgrade.
 
-Vor dem Release zuerst eine unterstützte Node-Version aktivieren und den hohen Metro-Befund ohne React-Native-Abweichung beseitigen:
+Verantwortlich für beide Restbefunde: Repositoryinhaber `hadi-elali`; Neubewertung spätestens am 22. November 2026 oder sofort bei kompatiblen Upstream-Fixes. Details und Reichweite stehen in `docs/supabase-egress-2026-11-14.md`, Abschnitt 9. Kritische Audit-Befunde sowie die kompatibel behebbaren hohen Befunde wurden beseitigt. `image-size` und der historische `xcode@3 -> uuid@7`-Pfad sind nicht mehr installiert; frühere Ausnahmen für diesen UUID-Pfad sind damit erledigt. Fremde Pull Requests dürfen nicht mit Produktions-Secrets bauen und Build-Assets müssen aus vertrauenswürdigen Quellen stammen.
+
+Vor dem Release eine unterstützte Node-Version aktivieren. Das Metro-Pinning bleibt erhalten:
 
 ```bash
 nvm install 24
@@ -83,18 +85,18 @@ npm run lint
 npx expo export --platform web
 ```
 
-Für Expo- und React-Native-Pakete niemals blind `npm audit fix --force` verwenden. Der Audit-Vorschlag kann Expo auf SDK 46 oder `expo-splash-screen` auf Version 55 zurückstufen. Expo-Abhängigkeiten werden mit `npx expo install --fix` an SDK 57 ausgerichtet. React Native bleibt auf der von Expo 57 validierten Version `0.86.2`, bis `npx expo install --check` einen neueren Patch akzeptiert. Metro-Pakete nicht einzeln per `overrides` mischen, da sie intern auf identische Patchstände gekoppelt sind.
+Für Expo- und React-Native-Pakete niemals blind `npm audit fix --force` verwenden. Audit-Vorschläge können inkompatible Expo-Downgrades oder SDK-Majorwechsel enthalten. Expo-Abhängigkeiten werden mit `npx expo install --fix` an SDK 57 ausgerichtet. React Native bleibt auf der von Expo 57 validierten Version `0.86.3`, bis `npx expo install --check` einen neueren Patch akzeptiert. Metro-Pakete nicht einzeln per `overrides` mischen, da sie intern auf identische Patchstände gekoppelt sind.
 
-Für `uuid` gibt es im aktuellen `xcode@3.0.1`-Pfad keinen kompatiblen transitiven Fix. Ein Override auf UUID 11 oder neuer ist ein ungeprüfter Major-Sprung und deshalb nicht zulässig. Solange der Pfad unverändert bleibt, darf der Befund nach erfolgreichem Build dokumentiert akzeptiert werden. Die Freigabedokumentation muss mindestens Advisory, Abhängigkeitspfad, Build-only-Reichweite, nicht verwendete betroffene API, verantwortliche Person und ein Ablaufdatum enthalten. Aktuelle Neubewertung spätestens am 15. September 2026 oder sofort bei einem Expo-/xcode-Update. Fremde Pull Requests dürfen nicht mit Produktions-Secrets bauen und Build-Assets müssen aus vertrauenswürdigen Quellen stammen.
+Bei verbleibenden Audit-Befunden müssen Advisory, Abhängigkeitspfad, tatsächliche Reichweite, verantwortliche Person und Ablaufdatum dokumentiert werden. Ein bestandener Build belegt keine vollständige Schwachstellenfreiheit.
 
 OVHcloud-Produktion:
 
-- Repository: `Bufib/islam-kinderakademie`
+- Repository laut aktuellem Git-Remote: `hadi-elali/islam-kinderakademie`
 - Produktions-URL: `https://www.bufib-kinder.de/`
 - Kanonischer Host: `www.bufib-kinder.de`; die Apex-Domain wird per `.htaccess` umgeleitet.
 - OVH-Stammordner: `www/`
 - Workflow: `.github/workflows/deploy-ovh.yml`
-- Deployment-Branch: `erweiterung5` (ein Push auf diesen Branch prüft, baut und veröffentlicht die aktuelle Web-App per SFTP).
+- Deployment-Branch: `erweiterung7` (ein Push auf diesen Branch prüft, baut und veröffentlicht die aktuelle Web-App per SFTP). Der Workflow führt auch `scripts/egress.test.mjs` aus; `release.json` im Export enthält ausschließlich den veröffentlichten Commit für die Live-Kontrolle.
 - Der Workflow erwartet die Repository-Secrets `EXPO_PUBLIC_SUPABASE_URL`, `EXPO_PUBLIC_SUPABASE_PUBLISHABLE_KEY`, `EXPO_PUBLIC_HCAPTCHA_SITE_KEY`, `OVH_SFTP_HOST`, `OVH_SFTP_USERNAME`, `OVH_SFTP_PASSWORD` und `OVH_SFTP_PORT`.
 
 Supabase:
@@ -662,3 +664,18 @@ npm run lint
 npx expo export --platform web
 git diff --check
 ```
+
+## 15. Supabase-Egress und Datenaktualisierung
+
+Die Analyse und Messgrenzen vom 14. November 2026 stehen in `docs/supabase-egress-2026-11-14.md`.
+
+- `src/lib/academy-sources.ts` definiert die globalen Tabellenprojektionen. `lesson_steps.content` und die vollständige Historie einzelner Quizantworten werden von keiner aktuellen Ansicht benötigt und nicht vorausgeladen; sichtbare Quizresultate kommen weiterhin über den Auswertungs-RPC.
+- `execute(action, changedKeys)` lädt nach einer Änderung nur die angegebenen Datengruppen neu. Dabei Datenbanktrigger und Löschkaskaden berücksichtigen. Insbesondere löscht Quizbearbeitung auch Versuche und Lektionsfortschritt. Ohne `changedKeys` erfolgt weiterhin ein vollständiger Refresh; diesen für Berechtigungs-/Gruppenänderungen und komplexe Kaskaden beibehalten.
+- `refresh-queue.ts` bündelt gleichzeitige Anfragen und serialisiert Reads. Eine während eines Reads abgeschlossene Änderung benötigt einen nachfolgenden Read.
+- Quiz-Antwortmöglichkeiten und Lösungsschlüssel werden bedarfsgesteuert mit `useAcademyData(['quizOptions'])` bzw. `useAcademyData(['quizOptions', 'quizAnswerKeys'])` geladen. `academy-data-loader.ts` verhindert doppelte Erstabrufe; `deferredAcademyDependencies` aktualisiert die zugehörigen Quiz-/Fragedaten gemeinsam. Formulare erst nach `isReady` initialisieren. Vollständige Refreshes laden auch die zuvor angeforderten Datengruppen erneut.
+- `signed-url-cache.ts` gehört ausschließlich zum jeweils angemeldeten Datenkontext. Für Medien in Komponenten `useAcademyData().getMediaUrl()` verwenden; Kontenabfragen teilen `signedUrls`. Keine private URL zwischen Konten teilen oder dauerhaft speichern. Vollständiger Refresh und Kontextwechsel leeren den Speicher. Gültigkeitszeiten und private Buckets nicht zur Egress-Optimierung ausweiten.
+- Neue Portraits werden im Web lokal verkleinert, sofern das Ergebnis kleiner ist. Native Uploads, WebP und animierte PNGs bleiben unverändert. Bestehende Dateien nicht ohne Prüfung ersetzen.
+- Zusätzliche Regressionstests: `node --test scripts/egress.test.mjs`. Lokale, aggregierte HAR-Auswertung: `node scripts/analyze-supabase-har.mjs /pfad/aufnahme.har`. HAR-Dateien können Tokens und personenbezogene Inhalte enthalten und gehören nicht ins Repository.
+- Optionales Storage-Inventar ohne Dateipfade: `supabase/diagnostics/egress-storage.sql`. Die Datei enthält ausschließlich SELECTs in einer Read-only-Transaktion und misst gespeicherte Größen, keinen monatlichen Egress.
+- Vor Optimierung live bestätigt: eine freigegebene Lektions-PDF mit 41.838.341 Bytes (`media_asset_id = 8`, `lesson_id = 3`) sowie zwei PNG-Portraits mit 2.173.712 und 1.249.894 Bytes. Am 15.11.2026 wurde die größte PDF nach Freigabe unter neuem privatem Objektpfad durch 13.459.005 Bytes ersetzt (67,83 % weniger); Originalobjekt bleibt als Rückfallkopie erhalten. Texte, 10 Seiten, 26 Lesezeichen, Struktur und Darstellung wurden geprüft, Upload per erneutem Download/SHA-256 kontrolliert. Wiederverwendbares Offline-Werkzeug: `scripts/optimize-lesson-pdf.py`. Bestehende Portraits bleiben unverändert.
+- Die vor Optimierung gemessene Summe aller Zeilen-JSON-Größen der ursprünglichen 26 globalen Tabellen beträgt 357.070 Bytes, vor RLS/HTTP/Kompression. Diagnose-SELECTs: `egress-live-summary.sql` und `egress-payload-summary.sql`. Größen sind kein Nachweis der monatlichen Dienstanteile; siehe Bericht Abschnitte 8–9. Bestandsdateien nicht ohne Inhaltsprüfung ersetzen.

@@ -23,7 +23,7 @@ const roleLabels: Record<DatabaseRole, string> = {
 
 export default function AccountsScreen() {
   const { profile, refreshProfile } = useAuth();
-  const { data, execute } = useAcademyData();
+  const { data, execute, signedUrls } = useAcademyData();
   const [accounts, setAccounts] = useState<AdminAccountSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -39,7 +39,7 @@ export default function AccountsScreen() {
 
   useEffect(() => {
     let active = true;
-    listAdminAccounts()
+    listAdminAccounts(signedUrls)
       .then((rows) => {
         if (!active) return;
         setAccounts(rows);
@@ -54,7 +54,7 @@ export default function AccountsScreen() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [signedUrls]);
 
   const visibleAccounts = useMemo(() => {
     const query = search.trim().toLowerCase();
@@ -69,7 +69,7 @@ export default function AccountsScreen() {
     setIsLoading(true);
     setLoadError(null);
     try {
-      setAccounts(await listAdminAccounts());
+      setAccounts(await listAdminAccounts(signedUrls));
     } catch (reason) {
       setLoadError(apiErrorMessage(reason));
     } finally {
@@ -110,7 +110,7 @@ export default function AccountsScreen() {
     setUploadingProfileId(account.profile_id);
     try {
       if (remove && account.portrait_path) {
-        await execute(() => removeStaffPortrait(account.profile_id, account.portrait_path!));
+        await execute(() => removeStaffPortrait(account.profile_id, account.portrait_path!), ['teachingContacts']);
       } else {
         const result = await DocumentPicker.getDocumentAsync({
           type: ['image/jpeg', 'image/png', 'image/webp'], multiple: false, copyToCacheDirectory: true,
@@ -121,7 +121,7 @@ export default function AccountsScreen() {
         const fileData = asset.file ? await asset.file.arrayBuffer() : await fetch(asset.uri).then((response) => response.arrayBuffer());
         const mimeType = asset.mimeType ?? ({ jpg: 'image/jpeg', jpeg: 'image/jpeg', png: 'image/png', webp: 'image/webp' }[asset.name.split('.').pop()?.toLowerCase() ?? '']);
         if (!mimeType) throw new Error('Bitte wähle ein JPG-, PNG- oder WebP-Bild.');
-        await execute(() => uploadStaffPortrait({ profileId: account.profile_id, data: fileData, mimeType, previousPath: account.portrait_path }));
+        await execute(() => uploadStaffPortrait({ profileId: account.profile_id, data: fileData, mimeType, previousPath: account.portrait_path }), ['teachingContacts']);
       }
       await reload();
     } catch (reason) {

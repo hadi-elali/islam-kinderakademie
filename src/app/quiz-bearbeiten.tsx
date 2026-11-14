@@ -37,11 +37,21 @@ export default function QuizEditorScreen() {
   const params = useLocalSearchParams<{ lessonId?: string; returnTo?: string }>();
   const lessonId = Number(params.lessonId);
   const returnPath = params.returnTo === 'dashboard' ? '/dashboard' : '/lektionen';
-  const { data, isLoading, error } = useAcademyData();
+  const { data, isLoading, isReady, error, refresh } = useAcademyData(['quizOptions', 'quizAnswerKeys']);
   const lesson = data.lessons.find((entry) => entry.id === lessonId) ?? null;
   const quiz = data.quizzes.find((entry) => entry.lesson_id === lessonId) ?? null;
 
-  if (isLoading && !lesson) return <DataLoading label="Quiz wird geladen …" />;
+  // Mount the form only after its existing options/answer keys are available.
+  // Otherwise useState would initialize an existing quiz with empty answers.
+  if (isLoading) return <DataLoading label="Quiz wird geladen …" />;
+
+  if (!isReady && error) {
+    return (
+      <PageScaffold title="Quiz nicht verfügbar">
+        <Card><ErrorBanner message={error} onRetry={() => void refresh().catch(() => {})} /></Card>
+      </PageScaffold>
+    );
+  }
 
   if (!Number.isFinite(lessonId) || !lesson) {
     return (
@@ -185,7 +195,7 @@ function QuizEditor({
               isCorrect: optionIndex === question.correctOption,
             })),
           })),
-        })
+        }), ['quizzes', 'quizQuestions', 'quizOptions', 'quizAnswerKeys', 'quizAttempts', 'lessonProgress']
       );
       router.replace(returnPath);
     } catch (reason) {
@@ -203,7 +213,7 @@ function QuizEditor({
     );
     if (!confirmed) return;
     try {
-      await execute(() => deleteRecord('lesson_quizzes', quiz.id));
+      await execute(() => deleteRecord('lesson_quizzes', quiz.id), ['quizzes', 'quizQuestions', 'quizOptions', 'quizAnswerKeys', 'quizAttempts', 'lessonProgress']);
       router.replace(returnPath);
     } catch (reason) {
       setFormError(apiErrorMessage(reason));
@@ -224,7 +234,7 @@ function QuizEditor({
     setReleasing(true);
     setFormError(null);
     try {
-      await execute(() => setQuizRelease(quiz.id, !quiz.is_published));
+      await execute(() => setQuizRelease(quiz.id, !quiz.is_published), ['quizzes']);
     } catch (reason) {
       setFormError(apiErrorMessage(reason));
     } finally {

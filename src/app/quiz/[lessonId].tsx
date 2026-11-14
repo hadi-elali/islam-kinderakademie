@@ -18,7 +18,7 @@ export default function QuizScreen() {
   const params = useLocalSearchParams<{ lessonId: string }>();
   const lessonId = Number(params.lessonId);
   const { selectedChildId } = useAcademy();
-  const { data, isLoading, error: loadError, refresh, execute } = useAcademyData();
+  const { data, isLoading, isReady, error: loadError, refresh, execute } = useAcademyData(['quizOptions']);
   const [answers, setAnswers] = useState<Record<number, number>>({});
   const [result, setResult] = useState<QuizSubmissionResult | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -55,7 +55,15 @@ export default function QuizScreen() {
     : [];
   const bestScore = previousAttempts.reduce((best, attempt) => Math.max(best, attempt.score_percent), 0);
 
-  if (isLoading && (!child || !lesson)) return <DataLoading label="Quiz wird geladen …" />;
+  if (isLoading) return <DataLoading label="Quiz wird geladen …" />;
+
+  if (!isReady && loadError) {
+    return (
+      <PageScaffold eyebrow="Quiz" title={quiz?.title ?? 'Quiz'}>
+        <ErrorBanner message={loadError} onRetry={() => void refresh().catch(() => {})} />
+      </PageScaffold>
+    );
+  }
 
   if (!child || !Number.isFinite(lessonId)) {
     return (
@@ -143,7 +151,7 @@ export default function QuizScreen() {
             questionId: question.id,
             optionId: answers[question.id],
           }))
-        )
+        ), ['quizAttempts', 'lessonProgress']
       );
       setResult(submissionResult);
     } catch (reason) {
