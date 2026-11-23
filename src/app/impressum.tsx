@@ -16,7 +16,7 @@ const fields: LegalPlaceholderField[] = [
   },
   {
     label: "Kontakt",
-    placeholder: "E-Mail: info@bufib.de {\n} Telefonnummer: 0174 5971114",
+    placeholder: "E-Mail: info@bufib.de \n Telefonnummer: 0174 5971114",
     
     href: "mailto:info@bufib.de",
   },
