@@ -1,0 +1,78 @@
+{
+  "date": "2026-11-23",
+  "target": "local production export on 127.0.0.1:4197",
+  "noFormsSubmitted": true,
+  "tests": [
+    {
+      "route": "/register",
+      "width": 390,
+      "beforeConsentRequests": 0,
+      "gate": true,
+      "contact": true,
+      "overflow": false,
+      "policyDate": true,
+      "afterConsentRequests": 5,
+      "requestTypes": [
+        {
+          "origin": "https://js.hcaptcha.com",
+          "path": "/1/api.js"
+        },
+        {
+          "origin": "https://<dynamic>.w.hcaptcha.com",
+          "path": "/logo.png"
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/captcha/v1/7b6de2b378178a05e8aa25e42494ec5883aa37f6/static/hcaptcha.html"
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/captcha/v1/7b6de2b378178a05e8aa25e42494ec5883aa37f6/static/i18n/de.json"
+        }
+      ],
+      "withdrawalOnPrivacyPage": true,
+      "afterWithdrawalRequests": 0,
+      "withdrawn": true
+    },
+    {
+      "route": "/passwort-vergessen",
+      "width": 1440,
+      "beforeConsentRequests": 0,
+      "gate": true,
+      "contact": true,
+      "overflow": false,
+      "policyDate": false,
+      "afterConsentRequests": 5,
+      "requestTypes": [
+        {
+          "origin": "https://js.hcaptcha.com",
+          "path": "/1/api.js"
+        },
+        {
+          "origin": "https://<dynamic>.w.hcaptcha.com",
+          "path": "/logo.png"
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/captcha/v1/59fab34fd0c9bad212300bf47494335c78cc9d9a/static/hcaptcha.html"
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/captcha/v1/59fab34fd0c9bad212300bf47494335c78cc9d9a/static/i18n/de.json"
+        }
+      ],
+      "afterWithdrawalRequests": 0,
+      "withdrawn": true,
+      "asksAgainAfterReload": true
+    },
+    {
+      "route": "/datenschutz",
+      "width": 390,
+      "beforeConsentRequests": 0,
+      "gate": false,
+      "contact": true,
+      "overflow": false,
+      "policyDate": true
+    }
+  ]
+}

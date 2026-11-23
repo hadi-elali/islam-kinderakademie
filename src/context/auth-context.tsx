@@ -15,6 +15,8 @@ import { AppState, Platform } from 'react-native';
 import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import type { PaymentMethod } from '@/types/database';
 import { validatePassword } from '@/utils/password';
+import { PRIVACY_VERSION, type PrivacyChoices } from '@/constants/privacy';
+import { getCaptchaConsent } from '@/lib/captcha-consent';
 
 export type AccountRole = 'parent' | 'teacher' | 'admin';
 
@@ -64,6 +66,7 @@ type AuthContextValue = {
     password: string,
     payment: SignUpPayment,
     captchaToken: string,
+    privacy: PrivacyChoices,
   ) => Promise<SignUpResult>;
 
   requestPasswordReset: (
@@ -451,6 +454,7 @@ export function AuthProvider({
       password: string,
       payment: SignUpPayment,
       captchaToken: string,
+      privacy: PrivacyChoices,
     ): Promise<SignUpResult> => {
       if (!supabase) {
         return {
@@ -462,6 +466,13 @@ export function AuthProvider({
       }
 
       const passwordValidation = validatePassword(password);
+
+      if (!privacy.guardianConfirmed || !privacy.childDataGranted) {
+        return {
+          error: 'Bitte bestätige deine Sorgeberechtigung und die ausdrückliche Einwilligung für Kinderprofile und Lernstände.',
+          needsEmailConfirmation: false,
+        };
+      }
 
       if (!passwordValidation.isValid) {
         return {
@@ -519,6 +530,11 @@ export function AuthProvider({
         };
       }
 
+      const captchaConsent = getCaptchaConsent();
+      if (!captchaConsent || captchaConsent.version !== PRIVACY_VERSION) {
+        return { error: 'Bitte entscheide zuerst über hCaptcha oder nutze die Kontaktalternative.', needsEmailConfirmation: false };
+      }
+
       const { data, error } =
         await supabase.auth.signUp({
           email,
@@ -558,6 +574,13 @@ export function AuthProvider({
 
               payment_accepted:
                 payment.paymentAccepted,
+              academy_privacy: {
+                version: PRIVACY_VERSION,
+                guardianConfirmed: privacy.guardianConfirmed,
+                childDataGranted: privacy.childDataGranted,
+                recordingGranted: privacy.recordingGranted,
+                hcaptchaGranted: true,
+              },
             },
           },
         });

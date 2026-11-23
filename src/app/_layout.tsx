@@ -6,19 +6,23 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { AppShell } from "@/components/app-shell";
 import { BrandMark } from "@/components/brand-mark";
+import { PrivacyGate } from "@/components/privacy-gate";
 import { Palette } from "@/constants/design";
 import { AcademyProvider, useAcademy } from "@/context/academy-context";
 import { AcademyDataProvider } from "@/context/academy-data-context";
 import { AuthProvider, useAuth } from "@/context/auth-context";
+import { PrivacyProvider, usePrivacy } from "@/context/privacy-context";
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
       <AuthProvider>
         <AcademyProvider>
-          <AcademyDataProvider>
-            <RootNavigator />
-          </AcademyDataProvider>
+          <PrivacyProvider>
+            <AcademyDataProvider>
+              <RootNavigator />
+            </AcademyDataProvider>
+          </PrivacyProvider>
         </AcademyProvider>
       </AuthProvider>
     </SafeAreaProvider>
@@ -29,6 +33,7 @@ function RootNavigator() {
   const { isAuthenticated, isInitializing, isProfileLoading, profile } =
     useAuth();
   const { activeRole } = useAcademy();
+  const { canLoadAcademyData } = usePrivacy();
   const pathname = usePathname();
   const router = useRouter();
 
@@ -59,6 +64,11 @@ function RootNavigator() {
         <ActivityIndicator color={Palette.forest} size="small" />
       </View>
     );
+  }
+
+  const canManagePrivacy = pathname === '/datenschutz' || pathname === '/impressum' || pathname === '/account';
+  if (isAuthenticated && !canLoadAcademyData && !canManagePrivacy) {
+    return <PrivacyGate />;
   }
 
   return (

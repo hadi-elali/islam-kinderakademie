@@ -7,7 +7,9 @@ insert into auth.users(id, email, raw_user_meta_data)
 select ('61010120-0000-0000-0000-' || lpad(n::text, 12, '0'))::uuid,
   'scope-test-' || n || '@example.invalid',
   jsonb_build_object('display_name', 'Scope-Test ' || n, 'payment_method', 'bank_transfer',
-    'payment_accepted', true, 'payment_payer_name', 'Scope-Test ' || n)
+    'payment_accepted', true, 'payment_payer_name', 'Scope-Test ' || n,
+    'academy_privacy', jsonb_build_object('version', public.current_privacy_version(),
+      'childDataGranted', true, 'recordingGranted', false, 'guardianConfirmed', true))
 from generate_series(1, 6) n;
 create temporary table scope_test_profiles as select id,
   right(auth_user_id::text, 1)::integer as n from public.profiles

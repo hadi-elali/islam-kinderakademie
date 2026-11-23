@@ -1,5 +1,6 @@
 import ConfirmHcaptcha from "@hcaptcha/react-native-hcaptcha";
-import { forwardRef, useImperativeHandle, useRef } from "react";
+import { CaptchaPrivacyGate } from '@/components/auth/captcha-privacy';
+import { forwardRef, useEffect, useImperativeHandle, useRef } from "react";
 import { View } from "react-native";
 
 import type {
@@ -9,6 +10,7 @@ import type {
 import { ActionButton, AppText } from "@/components/ui/primitives";
 import { Palette, Space } from "@/constants/design";
 import { hCaptchaBaseUrl } from "@/lib/hcaptcha";
+import { useCaptchaConsent } from '@/lib/captcha-consent';
 
 export const AuthCaptcha = forwardRef<AuthCaptchaHandle, AuthCaptchaProps>(
   function AuthCaptcha(
@@ -17,6 +19,13 @@ export const AuthCaptcha = forwardRef<AuthCaptchaHandle, AuthCaptchaProps>(
   ) {
     const captchaRef = useRef<ConfirmHcaptcha>(null);
     const markTokenUsedRef = useRef<(() => void) | null>(null);
+    const consent = useCaptchaConsent();
+    useEffect(() => {
+      if (!consent) {
+        markTokenUsedRef.current = null;
+        onTokenChange(null);
+      }
+    }, [consent, onTokenChange]);
 
     useImperativeHandle(
       forwardedRef,
@@ -32,6 +41,7 @@ export const AuthCaptcha = forwardRef<AuthCaptchaHandle, AuthCaptchaProps>(
     );
 
     return (
+      <CaptchaPrivacyGate disabled={disabled}>
       <View style={{ gap: Space.sm }}>
         <ActionButton
           label={
@@ -84,6 +94,7 @@ export const AuthCaptcha = forwardRef<AuthCaptchaHandle, AuthCaptchaProps>(
           }}
         />
       </View>
+      </CaptchaPrivacyGate>
     );
   },
 );

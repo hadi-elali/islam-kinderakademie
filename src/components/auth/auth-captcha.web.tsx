@@ -6,6 +6,7 @@ import type {
   AuthCaptchaHandle,
   AuthCaptchaProps,
 } from "@/components/auth/auth-captcha.types";
+import { CaptchaPrivacyGate } from '@/components/auth/captcha-privacy';
 
 export const AuthCaptcha = forwardRef<AuthCaptchaHandle, AuthCaptchaProps>(
   function AuthCaptcha(
@@ -26,6 +27,7 @@ export const AuthCaptcha = forwardRef<AuthCaptchaHandle, AuthCaptchaProps>(
     );
 
     return (
+      <CaptchaPrivacyGate disabled={disabled}>
       <View
         aria-disabled={disabled || undefined}
         pointerEvents={disabled ? "none" : "auto"}
@@ -47,6 +49,7 @@ export const AuthCaptcha = forwardRef<AuthCaptchaHandle, AuthCaptchaProps>(
           }}
         />
       </View>
+      </CaptchaPrivacyGate>
     );
   },
 );

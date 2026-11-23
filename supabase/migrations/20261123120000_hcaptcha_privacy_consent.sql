@@ -1,0 +1,362 @@
+-- Preserve 2026-11-15.1 verbatim. This is a new policy/consent snapshot.
+alter table public.privacy_document_versions add column captcha_text text not null default '';
+alter table public.privacy_consent_events drop constraint privacy_consent_events_purpose_check;
+alter table public.privacy_consent_events add constraint privacy_consent_events_purpose_check
+  check (purpose in ('child_data', 'recording', 'hcaptcha'));
+
+-- BEGIN PRIVACY VERSION
+insert into public.privacy_document_versions (version, policy_sha256, policy_text, guardian_text, child_data_text, recording_text, captcha_text)
+values ('2026-11-23.1',
+'18a3e8b6cb70c01001233c9810d91c9d62efb9756b37152de40b1cffb886cbdf',
+'# Datenschutzerklärung der Islam-Kinderakademie
+
+**Stand: 23. November 2026**
+
+## 1. Verantwortlicher und Kontakt
+
+Verantwortlich für die Verarbeitung personenbezogener Daten bei der Nutzung der Islam-Kinderakademie auf **www.bufib-kinder.de** ist:
+
+**Bund für islamische Bildung e. V.**  
+Füssener Str. 15  
+12309 Berlin  
+Vertreten durch den Vorstand  
+E-Mail: [info@bufib.de](mailto:info@bufib.de)  
+Telefon: 0174 5971114
+
+Unter diesen Kontaktdaten können sich Eltern, Kinder und andere betroffene Personen mit Datenschutzfragen und zur Ausübung ihrer Rechte an uns wenden.
+
+## 2. Geltungsbereich und Datenquellen
+
+Diese Erklärung gilt für unsere öffentliche Website, die geschützten Eltern-, Kinder- und Teambereiche, die Organisation und Durchführung des Online-Unterrichts sowie die damit verbundene Kommunikation und Beitragsverwaltung. Soweit Sie eine von uns bereitgestellte mobile App nutzen, gelten die entsprechend beschriebenen Verarbeitungsvorgänge auch dort.
+
+Personenbezogene Daten sind Informationen über eine bestimmte oder bestimmbare Person. Hierzu gehören beispielsweise Namen, E-Mail-Adressen, IP-Adressen, Kinderprofilen zugeordnete Lernergebnisse und Aufnahmen, auf denen Personen erkennbar sind.
+
+Wir erhalten Daten insbesondere durch Ihre Eingaben, durch Angaben Sorgeberechtigter über ihre Kinder, durch die Nutzung der Lernfunktionen, durch Einträge zuständiger Lehrkräfte und Administratoren sowie im Zusammenhang mit Unterricht, Kommunikation und Zahlungseingängen. Angaben zu einem abweichenden Zahler können wir vom Kontoinhaber und dem jeweiligen Zahlungsdienst erhalten. Bei Daten, die nicht unmittelbar bei der betroffenen Person erhoben werden, gelten ergänzend die Informationspflichten nach Art. 14 DSGVO. Rechte stehen auch Kindern selbst zu; Sorgeberechtigte nehmen diese nach Maßgabe ihrer Vertretungsberechtigung wahr.
+
+## 3. Rechtsgrundlagen
+
+Wir verarbeiten personenbezogene Daten insbesondere auf folgenden Grundlagen:
+
+- **Einwilligung, Art. 6 Abs. 1 Buchst. a DSGVO:** für bestimmte, gesondert erläuterte Verarbeitungsvorgänge. Eine Einwilligung kann jederzeit mit Wirkung für die Zukunft widerrufen werden.
+- **Vertrag und vorvertragliche Maßnahmen, Art. 6 Abs. 1 Buchst. b DSGVO:** soweit die Verarbeitung für einen Vertrag mit der betroffenen Person oder für von ihr veranlasste vorvertragliche Maßnahmen erforderlich ist.
+- **Gesetzliche Verpflichtung, Art. 6 Abs. 1 Buchst. c DSGVO:** insbesondere bei gesetzlich aufzubewahrenden Buchführungs- und Zahlungsunterlagen.
+- **Berechtigte Interessen, Art. 6 Abs. 1 Buchst. f DSGVO:** soweit die Verarbeitung erforderlich ist und die Interessen oder Grundrechte der betroffenen Personen nicht überwiegen. Das jeweilige Interesse wird in dieser Erklärung beschrieben. Die besondere Schutzbedürftigkeit von Kindern ist dabei zu berücksichtigen.
+
+Informationen zur Teilnahme an Religionsunterricht, Unterrichtsbeiträge und Lerndaten können Rückschlüsse auf religiöse oder weltanschauliche Überzeugungen zulassen. Die Teilnahme bedeutet nicht automatisch eine bestimmte Religionszugehörigkeit. Soweit besondere Kategorien personenbezogener Daten betroffen sind, ist zusätzlich eine Voraussetzung nach Art. 9 Abs. 2 DSGVO erforderlich. Die dafür vorgesehene ausdrückliche Einwilligung nach Art. 9 Abs. 2 Buchst. a DSGVO wird einmalig bei der Registrierung gesondert von einer Beitragsvereinbarung und von optionalen Aufnahmeentscheidungen eingeholt. Bestehende Familienkonten ohne einen entsprechenden Nachweis holen die Entscheidung vor weiterer Nutzung der Kinder- und Lernfunktionen nach.
+
+Die Kenntnisnahme dieser Datenschutzerklärung ist keine Einwilligung. Eine Zustimmung zum Teilnahmebeitrag ersetzt ebenfalls keine Datenschutz- oder Aufnahmeeinwilligung.
+
+## 4. Websiteaufruf und Hosting
+
+Wir nutzen **OVHcloud** für das Hosting unserer Website. Beim Aufruf werden die für Auslieferung und Betrieb erforderlichen technischen Informationen verarbeitet. Dazu gehören insbesondere IP-Adresse, Zeitpunkt des Zugriffs, angeforderte Seite beziehungsweise Datei, technische Statusmeldungen, übertragene Datenmenge sowie Browser- und Betriebssysteminformationen. Eine vom Browser übermittelte Herkunftsadresse kann ebenfalls verarbeitet werden.
+
+Die Verarbeitung dient der Bereitstellung und Sicherheit der Website, der Fehleranalyse und der Erkennung und Abwehr missbräuchlicher Zugriffe. Rechtsgrundlage ist Art. 6 Abs. 1 Buchst. f DSGVO. Unser berechtigtes Interesse liegt in einem verfügbaren und sicheren Online-Angebot. Technische Protokolle werden für diese Zwecke verarbeitet; eine längere Verwendung einzelner Einträge setzt einen fortbestehenden konkreten Anlass voraus, etwa die Aufklärung eines Sicherheitsvorfalls oder die Sicherung erforderlicher Nachweise.
+
+Weitere Informationen: [OVHcloud – Datenschutz](https://www.ovhcloud.com/de/personal-data-protection/).
+
+## 5. Elternkonto und Authentifizierung
+
+Für Registrierung, Anmeldung und Kontoverwaltung verarbeiten wir insbesondere Anzeigename, E-Mail-Adresse, Konto- und Anmeldekennungen, Passwortinformationen beim Authentifizierungsdienst, Bestätigungs- und Wiederherstellungsinformationen, Sitzungsdaten sowie zugewiesene Rollen und Berechtigungen. Bei der Registrierung werden außerdem die in Abschnitt 9 erläuterten Beitragsangaben erfasst.
+
+Diese Verarbeitung ermöglicht den geschützten Zugang zur Akademie, die Verwaltung des Kontos, die Wiederherstellung des Zugangs und die Absicherung von Änderungen und Kontolöschungen. Für den Nutzungsvertrag mit dem erwachsenen Kontoinhaber gilt Art. 6 Abs. 1 Buchst. b DSGVO. Zusätzliche erforderliche Maßnahmen gegen Missbrauch beruhen auf Art. 6 Abs. 1 Buchst. f DSGVO; unser berechtigtes Interesse liegt im Schutz der Konten und der Plattform. Soweit die Kontozuordnung besondere Kategorien personenbezogener Daten erkennen lässt, ist ergänzend Abschnitt 3 maßgeblich.
+
+Kinder melden sich nicht mit einem eigenen Kinderkonto an. Ihre Kinderansicht wird über das zugehörige Elternkonto geöffnet.
+
+Die Anmeldung erfolgt über **Supabase**. Wir verwenden außerdem Supabase-Datenbankfunktionen und geschützten Dateispeicher für die in dieser Erklärung beschriebenen Akademiedaten. Anbieter ist Supabase Pte. Ltd., Singapur. Die primäre Projektregion ist **eu-west-2, London, Vereinigtes Königreich**. Eine bestimmte Projektregion schließt weitere Verarbeitungen, etwa für Betrieb, Unterstützung oder die Auslieferung von Dateien, nicht vollständig aus. Die Hinweise zu internationalen Übermittlungen stehen in Abschnitt 15.
+
+Weitere Informationen: [Supabase – Auftragsverarbeitung](https://supabase.com/legal/customer-resources/data-processing-addendum), [Supabase – Speicherorte und Übermittlungen](https://supabase.com/legal/privacy-resources/data-residency-and-transfers-faq).
+
+## 6. Speicherung auf Ihrem Gerät
+
+Für die Aufrechterhaltung einer gewünschten Anmeldung werden Sitzungs- und Authentifizierungsinformationen auf Ihrem Gerät gespeichert. Im Browser wird dafür Webspeicher verwendet. In einer nativen App erfolgt die Speicherung über den dafür vorgesehenen geschützten Gerätespeicher. Die Sitzungsinformationen dienen dazu, Ihren Zugang wiederzuerkennen und die Anmeldung zu verwalten; sie können automatisch erneuert werden.
+
+Soweit die Speicherung oder der Zugriff unbedingt erforderlich ist, um einen von Ihnen ausdrücklich gewünschten digitalen Dienst bereitzustellen, gilt § 25 Abs. 2 Nr. 2 TDDDG. Andere einwilligungsbedürftige Speicher- oder Zugriffsvorgänge benötigen eine Einwilligung nach § 25 Abs. 1 TDDDG. Die Verarbeitung personenbezogener Daten richtet sich zusätzlich nach der jeweils genannten Grundlage der DSGVO. Diese Regeln betreffen auch vergleichbare Techniken außerhalb klassischer Cookies.
+
+Sie können sich abmelden und lokale Daten über Ihre Browser- oder Geräteeinstellungen entfernen. Dies kann eine erneute Anmeldung erforderlich machen. Eine Löschung auf dem Endgerät bewirkt nicht automatisch eine Löschung des Akademiekontos oder serverseitiger Daten. Bei einem gemeinsam genutzten Gerät sollten Sie Ihre Sitzung nach der Nutzung beenden.
+
+## 7. Kinderprofile und Unterrichtsorganisation
+
+Für Kinderprofile werden insbesondere der eingetragene Name, das Geburtsdatum, die Zuordnung zum Elternkonto, Altersgruppe, Akademiejahr und Unterrichtszeitgruppe verarbeitet. Hinzu kommen Gruppenwünsche, Freigaben und Änderungen der Zuordnung. Diese Angaben dienen der altersgerechten Zuordnung, Unterrichtsplanung und Verwaltung der Teilnahme.
+
+Die Verarbeitung personenbezogener Kinderprofil- und Lerndaten ist auf eine zuvor gesondert erteilte Einwilligung nach Art. 6 Abs. 1 Buchst. a DSGVO und bei möglichen Rückschlüssen auf religiöse Überzeugungen auf eine ausdrückliche Einwilligung nach Art. 9 Abs. 2 Buchst. a DSGVO ausgerichtet. Die Erklärung informiert insbesondere über die verarbeiteten Daten, Zwecke, Empfänger und Folgen eines Widerrufs. Die Berechtigung der einwilligenden Person sowie die Einsichtsfähigkeit und die eigenen Rechte des Kindes sind zu beachten.
+
+Die Entscheidung wird dem Familienkonto zugeordnet und mit Zweck, Textfassung, Zeitpunkt und bestätigter Sorge- beziehungsweise Vertretungsberechtigung dokumentiert. Die Texte der jeweiligen Fassung werden als Nachweis erhalten. Im Konto können Sie die Entscheidungen einsehen, ändern und widerrufen. Eine unveränderte, weiterhin gültige Entscheidung wird nicht bei jedem Besuch erneut abgefragt. Wesentliche Änderungen des Umfangs oder Zwecks können eine neue Entscheidung erforderlich machen. Die Erklärung gilt ausschließlich für Kinder, für die die erklärende Person tatsächlich berechtigt handeln darf.
+
+Soweit Art. 8 DSGVO für einen unmittelbar an Kinder gerichteten Dienst der Informationsgesellschaft und eine Verarbeitung auf Grundlage einer Einwilligung gilt, liegt die maßgebliche Altersgrenze in Deutschland bei 16 Jahren. Darunter ist die Einwilligung oder Zustimmung des Trägers der elterlichen Verantwortung erforderlich. Die allgemeinen Anforderungen an wirksame Einwilligungen bleiben bestehen.
+
+Die erforderlichen Daten werden im jeweiligen Formular gekennzeichnet. Ohne die für eine bestimmte Funktion erforderlichen Angaben beziehungsweise eine dafür erforderliche Einwilligung kann diese Funktion nicht genutzt werden. Eine Einwilligung in optionale Unterrichtsaufzeichnungen ist davon getrennt und keine Voraussetzung für die sonstige Teilnahme.
+
+## 8. Lernfortschritt, Quizze und Abgaben
+
+Bei der Nutzung der Lernfunktionen verarbeiten wir dem Kinderprofil zugeordnete bearbeitete und abgeschlossene Lernschritte, Fortschrittswerte, Quizversuche, ausgewählte Antworten, Ergebnisse, Bestanden-Status, Textantworten, Aufgabenbestätigungen, Abzeichen und zugehörige Zeitpunkte. Diese Informationen ermöglichen die Anzeige des Lernstands, Rückmeldungen zu Aufgaben und die pädagogische Begleitung. Für ihre Verarbeitung gelten die in Abschnitt 7 beschriebenen Einwilligungsgrundlagen.
+
+Eltern können die für ihr Konto vorgesehenen Informationen zu den zugeordneten Kindern einsehen. Lehrkräfte erhalten Zugriff im Rahmen ihrer Aufgaben und zugewiesenen Altersgruppen. Administratoren verwalten die Akademie und die dafür erforderlichen Daten. Kinderprofile und individuelle Lernergebnisse werden durch diese Funktionen nicht öffentlich angezeigt.
+
+Multiple-Choice-Quizze werden anhand hinterlegter Antworten und Bestehensgrenzen automatisch ausgewertet. Das Ergebnis kann den angezeigten Lernfortschritt aktualisieren. Damit werden keine ausschließlich automatisierten Entscheidungen über einen Schulabschluss oder vergleichbar erhebliche rechtliche oder tatsächliche Folgen getroffen. Bei Fragen zu einer Bewertung können Sie sich an uns wenden.
+
+## 9. Teilnahmebeiträge und Zahlungszuordnung
+
+Wir verarbeiten die gewählte Zahlungsart, den angegebenen Namen des verwendeten Zahlungskontos, die Beitragsvereinbarung, Beitragshöhe, Fälligkeiten und Zahlungsstatus. Die Angaben dienen der Vereinbarung und Verwaltung der Beiträge sowie der Zuordnung eingehender Zahlungen. Rechtsgrundlage ist Art. 6 Abs. 1 Buchst. b DSGVO. Für gesetzlich aufzubewahrende Belege gilt Art. 6 Abs. 1 Buchst. c DSGVO in Verbindung mit den einschlägigen steuerlichen Pflichten. Für erforderliche Klärung und Durchsetzung berechtigter Ansprüche kommt Art. 6 Abs. 1 Buchst. f DSGVO in Betracht. Die zusätzlichen Anforderungen bei besonderen Kategorien personenbezogener Daten nach Abschnitt 3 bleiben zu beachten.
+
+Die Registrierung fragt keine IBAN, Kontonummer oder PayPal-Zugangsdaten ab. Beim tatsächlichen Zahlungseingang können uns jedoch über den jeweiligen Zahlungsdienst oder einen Kontoauszug Transaktionsdaten, Zahlerangaben und je nach Zahlungsweg Kontoinformationen bekannt werden. Das betrifft gegebenenfalls auch einen vom Akademiekontoinhaber abweichenden Zahler.
+
+Bei einer Überweisung sind die beteiligten Kreditinstitute Empfänger der für die Zahlungsabwicklung erforderlichen Angaben. Bei PayPal-Zahlungen wird der Zahlungsdienst eigenständig tätig. Für den EWR nennt PayPal als zuständige Gesellschaft PayPal (Europe) S.à r.l. et Cie, S.C.A., Luxemburg. Weitere Informationen: [PayPal – Datenschutz](https://www.paypal.com/de/legalhub/paypal/privacy-full).
+
+Im Akademiesystem sind Zahlungsvereinbarungen und Monatszahlungen für die Administration vorgesehen. Die Löschung eines Kontos führt nicht zur automatischen Löschung gesetzlich aufzubewahrender Zahlungsbelege.
+
+## 10. Kontakt, Akademiemitteilungen und E-Mails
+
+Wenn Sie uns kontaktieren, verarbeiten wir Ihre Kontaktdaten, den Inhalt der Anfrage und erforderliche Bearbeitungsinformationen. Bei vertraglichen oder vorvertraglichen Anliegen gilt Art. 6 Abs. 1 Buchst. b DSGVO. Bei sonstigen Anliegen beruht die erforderliche Verarbeitung auf Art. 6 Abs. 1 Buchst. f DSGVO; unser berechtigtes Interesse liegt in der Bearbeitung und Beantwortung Ihrer Anfrage. Besondere Kategorien personenbezogener Daten benötigen zusätzlich die entsprechende Grundlage nach Art. 9 DSGVO.
+
+Innerhalb der Akademie werden Mitteilungen an bestimmte Konten, Gruppen oder die jeweils berechtigten Familien bereitgestellt. Beim Öffnen einer Mitteilung wird ein dem Profil zugeordneter Lesestatus mit Zeitpunkt gespeichert. Er dient dazu, gelesene und ungelesene Mitteilungen anzuzeigen. Rechtsgrundlage ist Art. 6 Abs. 1 Buchst. f DSGVO; unser Interesse liegt in einer übersichtlichen und verlässlichen Akademiekommunikation. Soweit daraus besondere Kategorien personenbezogener Daten hervorgehen, gilt zusätzlich die dafür erteilte ausdrückliche Einwilligung.
+
+Für konto- und nutzungsbezogene E-Mails, insbesondere Registrierung, Bestätigung und Passwortwiederherstellung, nutzen wir **Brevo**. Verarbeitet werden insbesondere Empfängeradresse, gegebenenfalls Empfängername, Nachrichteninhalt, Links sowie zur Übermittlung und Fehlerklärung erforderliche Versand- und Zustellinformationen. Diese Verarbeitung dient der Bereitstellung und Sicherheit des Kontos und der vereinbarten Kommunikation. Sie beruht für erforderliche Vertragsnachrichten auf Art. 6 Abs. 1 Buchst. b DSGVO; zusätzliche notwendige Sicherheits- und Zustellprüfungen können auf Art. 6 Abs. 1 Buchst. f DSGVO beruhen.
+
+Der E-Mail-Eingang für unsere Kontaktadresse info@bufib.de wird über **IONOS SE, Deutschland**, bereitgestellt. Dabei werden insbesondere Absender- und Empfängeradresse, Nachrichteninhalt, Anhänge und technische Zustellinformationen verarbeitet. Die genannten Rechtsgrundlagen für die Bearbeitung von Kontaktanfragen gelten entsprechend. Der Kontakt-Maildienst ist vom technischen Versand der Akademie-E-Mails über Brevo zu unterscheiden.
+
+Für Brevo haben wir die kontaktbezogene Einwilligungssteuerung aktiviert. Empfänger ohne dokumentierte Tracking-Einwilligung werden nicht personenbezogen anhand ihrer E-Mail-Öffnungen oder Linkklicks ausgewertet. Für unsere erforderlichen Kontonachrichten holen wir keine zusätzliche Tracking-Einwilligung ein. Technische Zustell-, Fehler- und gegebenenfalls zusammengefasste Betriebsinformationen können weiterhin verarbeitet werden; die Einstellung bedeutet keine vollständige Abschaltung sämtlicher technischer Messvorgänge des Anbieters. Eine darüber hinausgehende einwilligungsbedürftige Verarbeitung benötigt eine eigene vorherige Einwilligung und Information.
+
+Die Versandprotokolle bei Brevo werden automatisch nach **einem Monat** gelöscht. Die technische Durchführung der Löschung kann bis zu weitere 24 Stunden beanspruchen. **Neue E-Mail-Vorschauen werden nicht gespeichert.** Die Deaktivierung dieser Vorschauen bewirkt für sich allein keine rückwirkende Löschung früher gespeicherter Vorschauinhalte. Maßgeblich bleiben die in Abschnitt 17 beschriebenen Löschkriterien.
+
+Der dem Profil zugeordnete Lesestatus einer Mitteilung innerhalb der Akademie ist von einer E-Mail-Messung zu unterscheiden. Eine Einwilligung in erforderliche Akademiekommunikation ist keine pauschale Zustimmung zu Werbung oder zusätzlicher personenbezogener Erfolgsmessung.
+
+Weitere Informationen: [Brevo – Datenschutz](https://www.brevo.com/de/legal/privacypolicy/), [Brevo – Protokoll- und Vorschauaufbewahrung](https://help.brevo.com/hc/en-us/articles/4415743225746-Configure-a-custom-retention-period-for-your-transactional-logs-and-email-previews), [IONOS – Datenschutz](https://www.ionos.de/terms-gtc/datenschutzerklaerung/).
+
+## 11. Schutz vor automatisiertem Missbrauch mit hCaptcha
+
+Für bestimmte Kontofunktionen bieten wir **hCaptcha** von Intuition Machines, Inc., USA, zur Erkennung automatisierter oder missbräuchlicher Anfragen an. Dies betrifft die automatische Registrierung, Passwortwiederherstellung und erneute Passwortprüfung vor einer Kontolöschung. **Der Dienst wird erst nach Ihrer gesonderten Zustimmung über „Einwilligen und hCaptcha laden“ eingebunden.** Ohne Zustimmung wird keine Verbindung zu hCaptcha hergestellt. Sie können stattdessen Kontoanlage, Zugangshilfe oder Kontolöschung über [info@bufib.de](mailto:info@bufib.de) anfragen. Die Unterrichtsteilnahme hängt nicht von einer Zustimmung zu hCaptcha ab; eine erforderliche Identitätsprüfung bleibt möglich.
+
+Nach Zustimmung können IP-Adresse, Browser- und Geräteinformationen, Zeitpunkt und Kontext der Anfrage, Maus-, Tastatur- und Berührungsinteraktionen sowie Aufgaben und Antworten verarbeitet werden. hCaptcha prüft damit, ob eine Anfrage von einem Menschen stammt. Nach Anbieterangaben können nicht einer Person zugeordnete Aufgabenantworten außerdem zum Training maschineller Lernverfahren verwendet werden. Eingabefelder des Kontoformulars werden durch unsere Einbindung nicht als Aufgabenantworten an hCaptcha übergeben.
+
+Der Dienst kann Cookies und vergleichbare Zugriffe auf Ihrem Gerät verwenden. Bei der Browserprüfung wurden insbesondere `__cf_bm` zur Bot-Abwehr und `__cflb` zur Lastverteilung mit ungefähr 30 Minuten Laufzeit sowie nach Abschluss einer Aufgabe `hmt_id` mit 30 Tagen Laufzeit beobachtet. Der Anbieter beschreibt `hmt_id` insbesondere für dienstbezogene Statistiken und Barrierefreiheit. Die tatsächlich verwendeten Cookies können vom Browser und Prüfablauf abhängen; die Anbieterhinweise beschreiben weitere technische Varianten.
+
+Rechtsgrundlagen der angebotenen Einbindung sind Ihre Einwilligung nach Art. 6 Abs. 1 Buchst. a DSGVO sowie für einwilligungsbedürftige Speicherungen und Zugriffe § 25 Abs. 1 TDDDG. Soweit der Besuch der Akademieseite religiöse oder weltanschauliche Informationen erkennen lassen kann, umfasst die Abfrage hierfür die ausdrückliche Einwilligung nach Art. 9 Abs. 2 Buchst. a DSGVO. Eine mögliche Verarbeitung in den USA und die Übermittlungsgarantien sind in Abschnitt 15 beschrieben; die Ladezustimmung ersetzt keine erforderlichen internationalen Übermittlungsgarantien.
+
+Die Zustimmung gilt für die aktuell geöffnete Seite beziehungsweise App-Sitzung. Wir speichern diese Ladeentscheidung nur im Arbeitsspeicher; beim vollständigen Neuladen der Webseite oder Neustart der App ist eine neue Entscheidung erforderlich. Sie ist von Kinderprofilen und Unterrichtsaufnahmen getrennt. Bei einer erfolgreichen Registrierung wird zusätzlich die erteilte Zustimmung mit Textfassung, Zweck und serverseitigem Zeitpunkt als vergangener Nachweis zum Konto gespeichert. Dieser Nachweis erlaubt kein automatisches Laden bei späteren Besuchen. Bei bloßer Passwortwiederherstellung oder ohne abgeschlossene Registrierung wird daraus kein dauerhafter Kontonachweis angelegt.
+
+Über „hCaptcha-Einwilligung widerrufen“ an der Sicherheitsabfrage, im Konto oder auf dieser Datenschutzseite können Sie jederzeit für die Zukunft widerrufen. Die Webseite wird dabei neu geladen, damit auch das bereits geladene Anbieterskript beendet wird; nicht abgesendete Formulareingaben gehen verloren. In einer nativen App wird die Einbindung entfernt. Bereits gesetzte Drittanbieter-Cookies können wir auf deren Domains nicht unmittelbar löschen; sie können über die Browser- oder Geräteeinstellungen entfernt werden und unterliegen ansonsten ihren Ablaufzeiten. Der Widerruf berührt die vorherige Verarbeitung nicht.
+
+Weitere Informationen: [hCaptcha – Datenschutz und Cookie-Angaben](https://www.hcaptcha.com/privacy), [hCaptcha – Auftragsverarbeitung und Standardvertragsklauseln](https://newassets.hcaptcha.com/dpa/IMI_Data_Processing_Addendum_4.20.2023.pdf).
+
+## 12. Live-Unterricht und ursprüngliche Zoom-Aufnahmen
+
+Für Live-Unterricht nutzen wir **Zoom**. Berechtigte Familien erhalten einen externen Teilnehmerlink. Bei der Teilnahme werden insbesondere eingegebener Name, IP-Adresse, Geräte- und Verbindungsinformationen, Teilnahmezeiten und die jeweils freigegebenen Bild-, Ton-, Chat- und Bildschirminhalte verarbeitet. Andere Teilnehmende können die für sie freigegebenen Inhalte wahrnehmen. Anbieter ist Zoom Communications, Inc., USA. Die Einordnung der Verarbeitung als Auftragsverarbeitung oder eigene Verantwortlichkeit des Anbieters richtet sich nach der jeweiligen Leistung.
+
+Der Live-Unterricht dient der Durchführung des Unterrichtsangebots. Für erforderliche Vertragsdaten des erwachsenen Kontoinhabers gilt Art. 6 Abs. 1 Buchst. b DSGVO; für die personenbezogenen Daten des Kindes und mögliche Informationen über religiöse Überzeugungen gelten die in Abschnitt 7 erläuterten Einwilligungen.
+
+Bei einer Aufzeichnung des Unterrichts können Kinder in der ursprünglichen Datei sichtbar, hörbar oder anderweitig identifizierbar sein. Diese Originaldatei ist von der späteren YouTube-Fassung zu unterscheiden. Zweck der Aufzeichnung ist die Herstellung einer nachträglich abrufbaren Unterrichtsfassung, aus der sämtliche identifizierbaren Kinderinformationen entfernt werden.
+
+Für eine solche Aufnahme ist **vor Beginn eine gesonderte, freiwillige und nachweisbare Einwilligung** erforderlich. Sie umfasst die konkret erläuterten Bild-, Ton- und sonstigen Inhalte sowie bei möglichem Religionsbezug ausdrücklich Art. 9 Abs. 2 Buchst. a DSGVO. Eine Zustimmung zur allgemeinen Plattformnutzung oder zum Beitrag ersetzt diese Entscheidung nicht. Ohne Aufnahmezustimmung darf das betreffende Kind nicht mit identifizierbaren Inhalten aufgenommen werden; die Teilnahme am Unterricht muss ohne diese Aufnahme möglich sein. Der technische Aufnahmehinweis allein ersetzt die gesonderte Einwilligung nicht.
+
+Die optionale Aufnahmeentscheidung wird bei der Registrierung getrennt von der Einwilligung in Kinderprofile dokumentiert und kann im Konto geändert oder widerrufen werden. Ohne ausdrückliche Aufnahmeentscheidung gilt keine Aufnahmefreigabe. Zuständige Lehrkräfte können die aktuelle Freigabe für Kinder ihres Aufgabenbereichs prüfen und müssen sie bei der tatsächlichen Durchführung berücksichtigen. Die Entscheidung ersetzt keine erforderliche Zustimmung anderer aufgenommener Personen.
+
+Die ursprünglichen Aufnahmen und personenbezogenen Bearbeitungskopien speichern wir ausschließlich lokal auf einem PC. Zugriff erhalten nur die für Aufnahme und Bearbeitung berechtigten Administratoren. Eine automatische Synchronisierung dieser Dateien in einen Cloud-Speicher findet nicht statt. Die Originale und personenbezogenen Bearbeitungskopien werden nach abgeschlossener Bearbeitung und Kontrolle der bereinigten Fassung unverzüglich gelöscht. Die Aufbewahrung der bereinigten Unterrichtsvideos bis zum Ende des Unterrichtsjahres wird nicht auf personenbezogene Rohaufnahmen übertragen.
+
+Weitere Informationen: [Zoom – Datenschutz](https://www.zoom.com/de/trust/privacy/privacy-statement/).
+
+## 13. Bereinigte Unterrichtsvideos bei YouTube
+
+Für die Nachholung und Wiederholung werden Unterrichtsvideos bei **YouTube im Modus „Nicht gelistet“** bereitgestellt. In diesen Fassungen sind Kinder weder sichtbar noch hörbar oder anderweitig identifizierbar. Entfernt werden auch Namen, Anzeigenamen, erkennbare Chatbeiträge und andere Angaben, die eine Zuordnung zu einem Kind ermöglichen.
+
+Nicht gelistete Videos können von jeder Person mit dem Videolink angesehen werden; der Link kann weitergegeben werden. Diese Einstellung begrenzt den Zugriff nicht auf bestimmte Akademiekonten. Die Zusicherung, dass keine Kinder identifizierbar sind, ist deshalb unabhängig vom Linkstatus maßgeblich. [YouTube – Datenschutzeinstellungen für Videos](https://support.google.com/youtube/answer/157177?hl=de).
+
+Die Unterrichtsvideos werden zur Nachholung und Wiederholung während des jeweils zugehörigen Unterrichtsjahres bereitgestellt und **spätestens mit dessen Ende gelöscht**. Das Unterrichtsjahr dauert ein Jahr. Es beginnt keine zusätzliche zwölfmonatige Aufbewahrung für jedes einzelne Video. Eine gesetzlich erforderliche frühere Löschung personenbezogener Inhalte bleibt unberührt.
+
+Soweit Lehrkräfte oder andere Erwachsene in den bereitgestellten Videos erkennbar sind, ist ihre Berechtigung zur Aufnahme und Bereitstellung gesondert zu beachten. Die bereinigte Fassung enthält keine personenbezogenen Inhalte der Kinder; die beim Abspielen entstehenden Daten der Zuschauenden werden im folgenden Abschnitt erläutert.
+
+## 14. Datenverarbeitung beim Abspielen von YouTube-Videos
+
+Beim Laden eines eingebetteten YouTube-Players und bei der Wiedergabe werden Verbindungen zu Google beziehungsweise YouTube hergestellt. Dabei können IP-Adresse, Browser- und Geräteinformationen, die aufgerufene Seite sowie Wiedergabe- und Nutzungsinformationen verarbeitet werden. Informationen können im Endgerät gespeichert oder ausgelesen werden. Bei einer bestehenden Anmeldung beim Anbieter kann eine Zuordnung zum dortigen Konto möglich sein.
+
+Für YouTube ist im EWR regelmäßig Google Ireland Limited, Irland, tätig; weitere Gesellschaften und internationale Verarbeitungen können beteiligt sein. Die Nutzung von youtube-nocookie.com schließt die Übertragung personenbezogener Daten nicht vollständig aus.
+
+Der eingebettete Player wird erst geladen, nachdem die dafür vorgesehene Abfrage mit „YouTube-Video laden“ bestätigt wurde. Die Entscheidung ist von einer Einwilligung in ursprüngliche Unterrichtsaufnahmen getrennt. Rechtsgrundlage ist Art. 6 Abs. 1 Buchst. a DSGVO; bei möglichen Rückschlüssen auf religiöse Überzeugungen gilt zusätzlich die ausdrückliche Einwilligung nach Art. 9 Abs. 2 Buchst. a DSGVO. Einwilligungsbedürftige Speicherungen und Zugriffe im Endgerät richten sich zusätzlich nach § 25 Abs. 1 TDDDG. Über „Video schließen und Einwilligung widerrufen“ kann die Einbindung unmittelbar beendet werden. Bereits lokal gespeicherte Anbieterinformationen können Sie zusätzlich über Ihre Browser- oder Geräteeinstellungen entfernen. Weitere Anfragen und Widerrufe sind über den in Abschnitt 1 genannten Datenschutzkontakt möglich.
+
+Weitere Informationen: [Google – Datenschutz](https://policies.google.com/privacy?hl=de).
+
+## 15. Empfänger und internationale Übermittlungen
+
+Innerhalb der Akademie erhalten Personen Zugriff entsprechend ihren Aufgaben und Berechtigungen. Dazu gehören insbesondere zuständige Lehrkräfte, Administratoren und die Beitragsverwaltung. Sorgeberechtigte sehen die ihrem Konto zugeordneten Kinderinformationen.
+
+Externe Empfänger sind die für die beschriebenen Leistungen eingesetzten Hosting-, Datenbank-, Authentifizierungs-, Speicher-, Sicherheits-, E-Mail-, Video- und Zahlungsdienste. Die wesentlichen Anbieter sind OVHcloud, Supabase, Brevo, IONOS, hCaptcha, Zoom, Google/YouTube und bei entsprechendem Zahlungsweg PayPal beziehungsweise die beteiligten Kreditinstitute. Soweit für den jeweiligen Vorgang erforderlich, können außerdem beauftragte IT-Betreuung, Steuer- oder Rechtsberatung und gesetzlich berechtigte Behörden Empfänger sein. Auftragsverarbeiter handeln auftragsgebunden; eigenständige Verantwortliche verarbeiten Daten nach ihren eigenen gesetzlichen Pflichten und Rechtsgrundlagen.
+
+Die Supabase-Primärregion London liegt außerhalb von EU und EWR. Für das Vereinigte Königreich besteht ein Angemessenheitsbeschluss der Europäischen Kommission nach Art. 45 DSGVO. Dieser betrifft das Schutzniveau im Empfangsland; etwaige weitere Übermittlungen durch Diensteanbieter sind zusätzlich zu berücksichtigen.
+
+Bei den genannten internationalen Diensten können insbesondere Verarbeitungen oder Zugriffe in den USA und in Singapur hinzukommen. Supabase und hCaptcha sehen in ihren veröffentlichten Auftragsverarbeitungsbedingungen Standardvertragsklauseln für die erfassten internationalen Übermittlungen vor. Soweit ein einschlägiger Angemessenheitsbeschluss die konkrete Übermittlung erfasst, kann diese auf Art. 45 DSGVO beruhen. Bei US-Empfängern setzt die Anwendung des EU-US Data Privacy Framework insbesondere eine wirksame, einschlägige Zertifizierung voraus. Anderenfalls sind geeignete Garantien nach Art. 46 DSGVO und erforderlichenfalls zusätzliche Maßnahmen notwendig.
+
+Informationen über die für den jeweiligen Vorgang einschlägigen Garantien oder eine Kopie können Sie über unseren Datenschutzkontakt anfordern; berechtigte Geheimhaltungsinteressen werden durch erforderliche Schwärzungen berücksichtigt.
+
+Weitere Informationen: [Europäische Kommission – Angemessenheitsentscheidungen](https://commission.europa.eu/law/law-topic/data-protection/international-dimension-data-protection/adequacy-decisions_en).
+
+## 16. Lehrkräfte und Teamprofile
+
+Für Lehrkräfte und andere Teammitglieder werden insbesondere Name, Kontakt-E-Mail, Kontokennung, Rolle, zugewiesene Altersgruppe und gegebenenfalls ein hinterlegtes Porträt verarbeitet. Berechtigte Familien können die ihrer Altersgruppe zugeordneten Lehrkräfte als Ansprechpersonen sehen. Eine Kontaktfunktion öffnet das lokale E-Mail-Programm.
+
+Die erforderlichen dienstlichen Angaben dienen der Unterrichtsorganisation und der Kommunikation. Je nach Rechtsverhältnis gelten Art. 6 Abs. 1 Buchst. b DSGVO, bei Beschäftigten § 26 BDSG oder für eine erforderliche Zuordnung von Ansprechpersonen Art. 6 Abs. 1 Buchst. f DSGVO. Das berechtigte Interesse liegt in der verlässlichen Organisation des Angebots. Freiwillige Porträts und optionale Angaben sind von erforderlichen dienstlichen Informationen zu unterscheiden; eine darauf bezogene Einwilligung ist widerruflich.
+
+## 17. Speicherdauer und Löschung
+
+Wir speichern personenbezogene Daten nur so lange, wie es für den jeweiligen Zweck erforderlich ist oder eine konkrete gesetzliche Pflicht beziehungsweise fortbestehende Rechtsgrundlage die Aufbewahrung erlaubt. Maßgeblich sind insbesondere folgende Kriterien:
+
+| Datenart | Dauer beziehungsweise maßgebliches Löschkriterium |
+| --- | --- |
+| Konto und Kontoprofil | Für die Kontodauer und die erforderliche Abwicklung des Nutzungsverhältnisses; danach Löschung, soweit keine begründete weitere Aufbewahrung besteht. |
+| Kinderprofile und Gruppenzuordnungen | Für die Teilnahme und die dazugehörige Organisation; bei Zweckfortfall oder maßgeblichem Widerruf Löschung, soweit keine andere Rechtsgrundlage besteht. |
+| Lernstände, Quizantworten, Abgaben und Abzeichen | Solange die individuelle Lernbegleitung und Bereitstellung des betreffenden Angebots sie erfordern; keine pauschale Aufbewahrung aufgrund steuerlicher Belegfristen. |
+| Ursprüngliche Unterrichtsaufnahmen und personenbezogene Bearbeitungskopien | Unverzügliche Löschung nach abgeschlossener Bearbeitung und Kontrolle der bereinigten Fassung. |
+| Bereinigte Unterrichtsvideos und entsprechende eigene Arbeitskopien | Spätestens mit Ende des jeweils zugehörigen Unterrichtsjahres. |
+| Kontaktanfragen | Bis zur abschließenden Bearbeitung; darüber hinaus nur, soweit weitere vertragliche, gesetzliche oder konkret begründete Nachweiszwecke bestehen. |
+| Mitteilungen und Lesestatus | Solange für die Bereitstellung und den zugehörigen Lesestatus erforderlich; bei Wegfall der zugehörigen Mitteilung oder des Profils entsprechend zu löschen. |
+| Versandprotokolle bei Brevo | Automatische Löschung nach einem Monat; die technische Durchführung kann bis zu weitere 24 Stunden beanspruchen. Neue Vorschauinhalte werden nicht gespeichert. |
+| Technische API- und Datenbank-Dienstprotokolle bei Supabase | Im verwendeten Free-Tarif beträgt die veröffentlichte Standardaufbewahrung einen Tag. Diese Frist betrifft die technischen Dienstprotokolle und gilt nicht pauschal für gespeicherte Konto-, Kinder- oder Lerndaten. |
+| Sonstige Sicherheits- und Fehlerprotokolle | Für die erforderliche Fehlerbehebung beziehungsweise konkrete Sicherheitsprüfung; ein fortbestehender Nachweisbedarf ist gesondert zu beurteilen. |
+| Teamprofile und Porträts | Für die jeweilige Tätigkeit und erforderliche Sichtbarkeit; nach deren Ende Entfernung aus den aktiven Ansichten und Löschung nicht mehr benötigter Angaben. |
+| hCaptcha-Ladeentscheidung | Nur im Arbeitsspeicher der geöffneten Webseite beziehungsweise App; bis zum Widerruf, vollständigen Neuladen oder Neustart. Anbieter-Cookies können darüber hinaus gemäß Abschnitt 11 bestehen. |
+| Einwilligungsnachweise | Soweit und solange zur Erfüllung gesetzlicher Nachweispflichten beziehungsweise für konkrete Rechtsansprüche erforderlich. |
+| Buchführungs- und Zahlungsunterlagen | Nach den einschlägigen gesetzlichen Fristen: regelmäßig acht Jahre für Buchungsbelege, zehn Jahre für erfasste Bücher und Abschlussunterlagen sowie sechs Jahre für erfasste Geschäftsbriefe und sonstige steuerrelevante Unterlagen. |
+
+Gesetzliche Fristen richten sich insbesondere nach § 147 AO und, soweit anwendbar, § 257 HGB. Fristbeginn, mögliche Ablaufhemmungen und sonstige gesetzliche Besonderheiten sind zu beachten. Die Aufbewahrungspflicht einzelner Belege rechtfertigt keine Speicherung sämtlicher Akademiedaten.
+
+Sicherungskopien unterliegen der für das jeweilige System vorgesehenen gesicherten Aufbewahrung und Überschreibung. Sie dürfen nicht zur gewöhnlichen Weiternutzung bereits zu löschender Daten verwendet werden. Bei einer Wiederherstellung sind bereits veranlasste Löschungen erneut zu berücksichtigen. Im verwendeten Supabase-Free-Tarif sind automatische tägliche Kunden-Datenbankbackups nicht enthalten. Weitere Informationen zu technischen Dienstprotokollen und Sicherungen: [Supabase – Tarifvergleich](https://supabase.com/pricing), [Supabase – Datenbanksicherungen](https://supabase.com/docs/guides/platform/backups).
+
+Sie können die Kontolöschung über die vorgesehene Funktion oder über unseren Datenschutzkontakt veranlassen. Zur Absicherung ist bei der Selbstbedienungsfunktion eine erneute Passwortbestätigung vorgesehen. Gesetzlich erforderliche Belege können unabhängig davon weiter aufbewahrt werden. Eine bloße Entkopplung von Datensätzen gilt nur dann als Anonymisierung, wenn eine Reidentifizierung nach dem rechtlichen Maßstab tatsächlich ausgeschlossen ist.
+
+## 18. Ihre Rechte und Einwilligungswiderruf
+
+Nach Maßgabe der gesetzlichen Voraussetzungen haben Sie insbesondere folgende Rechte:
+
+- **Auskunft und Datenkopie** nach Art. 15 DSGVO;
+- **Berichtigung** unrichtiger und Vervollständigung unvollständiger Daten nach Art. 16 DSGVO;
+- **Löschung** nach Art. 17 DSGVO;
+- **Einschränkung der Verarbeitung** nach Art. 18 DSGVO;
+- **Datenübertragbarkeit** nach Art. 20 DSGVO für die von Ihnen bereitgestellten Daten, soweit die Verarbeitung auf Einwilligung oder Vertrag beruht und automatisiert erfolgt;
+- **Widerruf einer Einwilligung** nach Art. 7 Abs. 3 DSGVO jederzeit mit Wirkung für die Zukunft. Die Rechtmäßigkeit der Verarbeitung bis zum Widerruf bleibt unberührt.
+
+**Widerspruchsrecht:** Bei einer Verarbeitung nach Art. 6 Abs. 1 Buchst. e oder f DSGVO können Sie aus Gründen Ihrer besonderen Situation widersprechen. Wir verarbeiten die betreffenden Daten dann nicht weiter, sofern wir keine zwingenden schutzwürdigen Gründe nachweisen oder die Verarbeitung der Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen dient. Gegen Direktwerbung einschließlich damit zusammenhängenden Profilings können Sie jederzeit ohne Begründung widersprechen; diese Verarbeitung wird dann beendet.
+
+Die Einwilligungen in Kinderdaten und ursprüngliche Unterrichtsaufnahmen können Sie im Konto unter „Meine Datenschutzentscheidungen“ einsehen und für die Zukunft widerrufen. Ein Widerruf der Kinderdaten-Einwilligung beendet den Zugang zu den davon abhängigen Kinder- und Lernfunktionen sowie eine daran gebundene Aufnahmefreigabe. Ihr Konto bleibt zur Verwaltung und zur Wahrnehmung Ihrer Rechte zugänglich. Bestehende Daten sind anschließend auf eine erforderliche Löschung oder Beschränkung zu prüfen; eine automatische Löschung sämtlicher Belege ist damit nicht verbunden.
+
+Für Anfragen und einen Widerruf können Sie sich außerdem an [info@bufib.de](mailto:info@bufib.de) wenden. Der Widerruf muss so einfach wie die Erteilung der Einwilligung sein. Bei begründeten Zweifeln an Identität oder Vertretungsberechtigung können wir dafür erforderliche zusätzliche Informationen anfordern. Rechte stehen auch den betroffenen Kindern zu; ihre Einsichtsfähigkeit und eigenen Schutzinteressen sind zu beachten.
+
+Wir bearbeiten Anträge grundsätzlich unverzüglich und spätestens innerhalb eines Monats. Bei einer gesetzlich zulässigen Verlängerung um bis zu zwei weitere Monate informieren wir Sie innerhalb des ersten Monats über die Verlängerung und ihre Gründe. Die Rechtsausübung ist grundsätzlich unentgeltlich; gesetzliche Ausnahmen bei offenkundig unbegründeten oder exzessiven Anträgen bleiben vorbehalten.
+
+## 19. Beschwerderecht
+
+Sie können sich nach Art. 77 DSGVO bei einer Datenschutzaufsichtsbehörde beschweren, insbesondere am Ort Ihres gewöhnlichen Aufenthalts, Ihres Arbeitsplatzes oder des vermuteten Verstoßes. Eine vorherige Kontaktaufnahme mit uns ist keine Voraussetzung.
+
+Für unseren Verein mit Sitz in Berlin ist regelmäßig folgende Behörde zuständig:
+
+**Berliner Beauftragte für Datenschutz und Informationsfreiheit**  
+Alt-Moabit 59–61  
+10555 Berlin  
+E-Mail: [mailbox@datenschutz-berlin.de](mailto:mailbox@datenschutz-berlin.de)  
+Telefon: +49 30 13889-0  
+[Kontakt und Beschwerdeangebot](https://www.datenschutz-berlin.de/ueber-uns/kontakt)
+
+## 20. Kurz erklärt für Kinder
+
+Deine Eltern können ein Profil für dich anlegen. Wir verarbeiten zum Beispiel deinen Namen, deinen Geburtstag, deine Unterrichtsgruppe und deine Aufgaben- und Quizergebnisse. Deine Eltern und die zuständigen Personen im Akademieteam können die dafür vorgesehenen Informationen sehen.
+
+Im Live-Unterricht können andere Teilnehmende deinen Namen, deine Stimme oder dein Kamerabild wahrnehmen, wenn du diese Funktionen verwendest. Eine Aufnahme ist eine eigene Entscheidung. Ohne die dafür notwendige Zustimmung darfst du nicht mit erkennbaren Informationen aufgenommen werden.
+
+Wenn eine Aufnahme erstellt wird, werden Angaben über dich aus der späteren YouTube-Fassung entfernt. In dieser Fassung bist du nicht zu sehen oder zu hören und auch nicht über deinen Namen oder andere Angaben erkennbar. Die ursprüngliche Aufnahme wird nach der Bearbeitung und Kontrolle gelöscht. Die bereinigten Unterrichtsvideos stehen bis zum Ende des Unterrichtsjahres zur Verfügung und werden spätestens dann gelöscht.
+
+Wenn du Fragen hast oder etwas nicht möchtest, sprich deine Eltern oder uns an. Du kannst dich auch selbst an uns wenden. Wir erklären dir verständlich, welche Daten wir über dich haben und welche Rechte du hast.
+
+## 21. Änderungen dieser Erklärung
+
+Wir passen diese Erklärung an, wenn sich das Angebot, die tatsächliche Verarbeitung oder die rechtlichen Vorgaben ändern. Vor einer Weiterverarbeitung für einen neuen Zweck stellen wir die erforderlichen Informationen bereit. Eine für eine neue Verarbeitung erforderliche Einwilligung wird durch eine Änderung dieser Erklärung nicht ersetzt.
+',
+'Ich bin volljährig und für die Kinder, die ich diesem Familienkonto zuordne, sorgeberechtigt oder wirksam zur Abgabe dieser Erklärungen bevollmächtigt. Erforderliche weitere Zustimmungen liegen vor; die eigenen Rechte und eine erforderliche eigene Entscheidung des Kindes werden berücksichtigt.',
+'Ich willige ausdrücklich ein, dass der Bund für islamische Bildung e. V. für die von mir diesem Familienkonto zugeordneten Kinder Name, Geburtsdatum, Elternzuordnung, Alters- und Unterrichtsgruppe sowie Lernschritte, Quizantworten und Ergebnisse, Textabgaben und Abzeichen zur Unterrichtsorganisation und persönlichen Lernbegleitung verarbeitet. Meine ausdrückliche Einwilligung umfasst auch dabei möglicherweise erkennbare religiöse oder weltanschauliche Überzeugungen (Art. 6 Abs. 1 Buchst. a und Art. 9 Abs. 2 Buchst. a DSGVO). Berechtigte Eltern, zuständige Lehrkräfte und Administratoren sowie die in der Datenschutzerklärung genannten technischen Dienste erhalten die dort beschriebenen Zugriffe. Die Daten werden nur für die dort erläuterten Zwecke und Aufbewahrungszeiträume verarbeitet. Ich kann diese Einwilligung jederzeit in meinem Konto oder über info@bufib.de mit Wirkung für die Zukunft widerrufen. Ohne diese Grundlage können die personenbezogenen Kinder- und Lernfunktionen nicht bereitgestellt werden. Eine Unterrichtsaufnahme ist damit nicht erlaubt.',
+'Zusätzlich und freiwillig willige ich ein, dass die von mir diesem Familienkonto zugeordneten Kinder in ursprünglichen Zoom-Aufnahmen ihres gebuchten Unterrichts mit Bild, Stimme, angezeigtem Namen und im Aufnahmebild oder -ton enthaltenen Beiträgen erfasst werden dürfen. Dies dient ausschließlich dem Schnitt einer Wiederholungsfassung ohne identifizierbare Kinderdaten. Ich willige ausdrücklich auch in die Verarbeitung dabei möglicherweise erkennbarer religiöser oder weltanschaulicher Informationen ein (Art. 6 Abs. 1 Buchst. a und Art. 9 Abs. 2 Buchst. a DSGVO). Zugriff auf Originale haben nur die berechtigten Aufnahme- und Bearbeitungspersonen und erforderlichen technischen Dienste. Originale und personenbezogene Bearbeitungskopien werden nach fertigem Schnitt und Kontrolle unverzüglich gelöscht. Bei YouTube wird ausschließlich die bereinigte Fassung ohne erkennbare Kinder als „Nicht gelistet“ bereitgestellt; jeder mit dem Link kann sie ansehen. Diese Fassung wird spätestens mit Ende des zugehörigen Unterrichtsjahres gelöscht. Meine Entscheidung ist unabhängig vom Beitrag und den Kinderprofilen. Bei Ablehnung oder Widerruf muss eine Teilnahme ohne personenbezogene Aufnahme möglich bleiben. Ich kann jederzeit in meinem Konto oder über info@bufib.de für die Zukunft widerrufen; eine Veröffentlichung erkennbarer Kinder ist durch diese Erklärung nicht erlaubt.',
+'Ich willige ein, dass hCaptcha von Intuition Machines, Inc., USA, für diese geöffnete Seite bzw. App-Sitzung geladen wird. Der Dienst verarbeitet zur Bot-Prüfung IP-Adresse, Browser- und Gerätedaten, Interaktionen und Aufgabenantworten und kann Cookies bis zu 30 Tage speichern oder auslesen. Nach Anbieterangaben können nicht einer Person zugeordnete Aufgabenantworten auch zum Training maschineller Lernverfahren dienen. Eine Verarbeitung in den USA ist möglich. Ich willige ausdrücklich auch in die Verarbeitung dabei möglicherweise erkennbarer religiöser oder weltanschaulicher Informationen durch den Besuch dieser Akademieseite ein (Art. 6 Abs. 1 Buchst. a und Art. 9 Abs. 2 Buchst. a DSGVO sowie § 25 Abs. 1 TDDDG). Ich kann hier, in meinem Konto oder unter Datenschutz jederzeit für die Zukunft widerrufen. Ohne diese Einwilligung kann ich mein Kontoanliegen über info@bufib.de erledigen; die Teilnahme am Unterricht hängt nicht von ihr ab.');
+-- END PRIVACY VERSION
+
+create or replace function public.current_privacy_version() returns text
+language sql immutable set search_path = '' as $$ select '2026-11-23.1'::text $$;
+
+-- A CAPTCHA-only change must not invalidate unchanged child/recording grants.
+-- Compare the archived purpose texts, never fabricate replacement events.
+create function public.privacy_purpose_version_is_current(version_to_check text, purpose_to_check text)
+returns boolean language sql stable set search_path = '' as $$
+  select exists (
+    select 1 from public.privacy_document_versions previous
+    join public.privacy_document_versions current on current.version = public.current_privacy_version()
+    where previous.version = version_to_check
+      and previous.guardian_text = current.guardian_text
+      and previous.child_data_text = current.child_data_text
+      and (purpose_to_check = 'child_data'
+        or (purpose_to_check = 'recording' and previous.recording_text = current.recording_text))
+  )
+$$;
+revoke all on function public.privacy_purpose_version_is_current(text, text) from public, anon, authenticated;
+
+create or replace function public.has_child_data_consent(target_profile_id bigint) returns boolean
+language sql stable security definer set search_path = '' as $$
+  select coalesce((
+    select e.granted and public.privacy_purpose_version_is_current(e.policy_version, e.purpose)
+    from public.privacy_consent_events e
+    join public.profiles p on p.auth_user_id = e.auth_user_id
+    where p.id = target_profile_id and e.purpose = 'child_data'
+    order by e.id desc limit 1
+  ), false)
+$$;
+
+create or replace function public.get_privacy_state()
+returns table(policy_version text, child_data_granted boolean, recording_granted boolean,
+  child_data_recorded_at timestamptz, recording_recorded_at timestamptz)
+language sql stable security definer set search_path = '' as $$
+  with latest as (
+    select distinct on (e.purpose) e.* from public.privacy_consent_events e
+    where e.auth_user_id = auth.uid() order by e.purpose, e.id desc
+  )
+  select public.current_privacy_version(),
+    coalesce((select granted and public.privacy_purpose_version_is_current(policy_version, purpose) from latest where purpose = 'child_data'), false),
+    coalesce((select granted and public.privacy_purpose_version_is_current(policy_version, purpose) from latest where purpose = 'child_data'), false)
+      and coalesce((select granted and public.privacy_purpose_version_is_current(policy_version, purpose) from latest where purpose = 'recording'), false),
+    (select recorded_at from latest where purpose = 'child_data'),
+    (select recorded_at from latest where purpose = 'recording')
+  where auth.uid() is not null
+$$;
+
+create or replace function public.get_child_recording_permissions()
+returns table(child_id bigint, recording_allowed boolean)
+language sql stable security definer set search_path = '' as $$
+  select c.id,
+    public.has_child_data_consent(c.parent_profile_id)
+      and coalesce((select e.granted and public.privacy_purpose_version_is_current(e.policy_version, e.purpose)
+        from public.privacy_consent_events e where e.auth_user_id = p.auth_user_id and e.purpose = 'recording'
+        order by e.id desc limit 1), false)
+  from public.children c join public.profiles p on p.id = c.parent_profile_id
+  where auth.uid() is not null and public.can_manage_child(c.id)
+$$;
+
+create or replace function public.capture_registration_privacy() returns trigger
+language plpgsql security definer set search_path = '' as $$
+declare choice jsonb := new.raw_user_meta_data -> 'academy_privacy';
+begin
+  -- Manually created accounts decide on child/recording purposes at first login.
+  -- Never infer CAPTCHA permission from account creation or a child-data grant.
+  if choice is null then return new; end if;
+  if choice ->> 'version' is distinct from public.current_privacy_version()
+    or (choice -> 'guardianConfirmed') is distinct from 'true'::jsonb
+    or (choice -> 'childDataGranted') is distinct from 'true'::jsonb
+    or pg_catalog.jsonb_typeof(choice -> 'recordingGranted') is distinct from 'boolean' then
+    raise exception 'Eine aktuelle ausdrückliche Einwilligung und Sorgeberechtigung sind erforderlich.' using errcode = '22023';
+  end if;
+  if choice ? 'hcaptchaGranted' and (choice -> 'hcaptchaGranted') is distinct from 'true'::jsonb then
+    raise exception 'Eine hCaptcha-Freigabe darf nicht aus einer anderen Entscheidung abgeleitet werden.' using errcode = '22023';
+  end if;
+  insert into public.privacy_consent_events(auth_user_id, purpose, policy_version, granted, guardian_confirmed, source)
+  values (new.id, 'child_data', public.current_privacy_version(), true, true, 'registration'),
+         (new.id, 'recording', public.current_privacy_version(), (choice ->> 'recordingGranted')::boolean, true, 'registration');
+  if (choice -> 'hcaptchaGranted') = 'true'::jsonb then
+    insert into public.privacy_consent_events(auth_user_id, purpose, policy_version, granted, guardian_confirmed, source)
+    values (new.id, 'hcaptcha', public.current_privacy_version(), true, true, 'registration');
+  end if;
+  return new;
+end
+$$;
+-- No metadata UPDATE trigger and no CAPTCHA backfill. This event is evidence
+-- of registration only, NEVER permission to reload hCaptcha on another visit.

@@ -2,6 +2,7 @@ import { useRef, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import { AuthCaptcha } from "@/components/auth/auth-captcha";
+import { PrivacySettings } from "@/components/privacy-settings";
 import type { AuthCaptchaHandle } from "@/components/auth/auth-captcha.types";
 import { AppIcon } from "@/components/ui/app-icon";
 import { StaffPortrait } from "@/components/staff-portrait";
@@ -370,6 +371,7 @@ export default function AccountScreen() {
       title="Mein Account"
       description="Hier siehst du deine Kontodaten und verwaltest deine Anmeldung."
     >
+      <PrivacySettings />
       <View style={[styles.layout, compact && styles.column]}>
         <Card style={[styles.profileCard, compact && styles.fullWidth]}>
           <View style={styles.profileHeader}>

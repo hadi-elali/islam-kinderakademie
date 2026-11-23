@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { StyleSheet, View } from "react-native";
 
 import { AppIcon } from "@/components/ui/app-icon";
+import { RecordingPermissions } from "@/components/recording-permissions";
 import {
   ChoiceChips,
   DataLoading,
@@ -526,6 +527,10 @@ export default function GroupsScreen() {
             })}
           </View>
         )}
+      </Card>
+
+      <Card>
+        <RecordingPermissions childrenById={data.children} />
       </Card>
 
       <FormDialog

@@ -15,6 +15,7 @@ import { SignedUrlCache } from '@/lib/signed-url-cache';
 import { createAcademyDataLoader } from '@/lib/academy-data-loader';
 import { AcademyData, MediaAssetRow, emptyDatabaseData } from '@/types/database';
 import { useAuth } from '@/context/auth-context';
+import { usePrivacy } from '@/context/privacy-context';
 
 type AcademyDataContextValue = {
   data: AcademyData;
@@ -34,14 +35,16 @@ const AcademyDataContext = createContext<AcademyDataContextValue | null>(null);
 
 export function AcademyDataProvider({ children }: PropsWithChildren) {
   const { user, profile } = useAuth();
-  return <ScopedAcademyDataProvider key={`${user?.id ?? 'signed-out'}:${profile?.id ?? ''}:${profile?.role ?? ''}`}>
+  const { canLoadAcademyData } = usePrivacy();
+  return <ScopedAcademyDataProvider key={`${user?.id ?? 'signed-out'}:${profile?.id ?? ''}:${profile?.role ?? ''}:${canLoadAcademyData}`}>
     {children}
   </ScopedAcademyDataProvider>;
 }
 
 function ScopedAcademyDataProvider({ children }: PropsWithChildren) {
   const { profile, isAuthenticated } = useAuth();
-  const profileId = profile?.id;
+  const { canLoadAcademyData } = usePrivacy();
+  const profileId = canLoadAcademyData ? profile?.id : null;
   const accountRole = profile?.role;
   const [data, setData] = useState<AcademyData>(emptyDatabaseData);
   const [isLoading, setIsLoading] = useState(isAuthenticated && Boolean(profileId));

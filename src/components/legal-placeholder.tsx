@@ -1,4 +1,5 @@
 import { Href, useRouter } from "expo-router";
+import type { ReactNode } from "react";
 import {
   Linking,
   Pressable,
@@ -22,6 +23,7 @@ export type LegalPlaceholderField = {
   label: string;
   placeholder: string;
   href?: string;
+  content?: ReactNode;
 };
 
 type LegalPlaceholderProps = {
@@ -70,7 +72,7 @@ export function LegalPlaceholder({
             <AppText variant="label" color={Palette.forest}>
               {field.label}
             </AppText>
-            {field.href ? (
+            {field.content ?? (field.href ? (
               <Pressable
                 accessibilityRole="link"
                 onPress={() => void Linking.openURL(field.href!)}
@@ -82,7 +84,7 @@ export function LegalPlaceholder({
               </Pressable>
             ) : (
               <AppText color={Palette.inkSoft}>{field.placeholder}</AppText>
-            )}
+            ))}
           </View>
         ))}
       </Card>
@@ -113,14 +115,14 @@ export function LegalPlaceholder({
         </Pressable>
         <Pressable
           accessibilityRole="link"
-          onPress={() => open("/")}
+          onPress={() => router.canGoBack() ? router.back() : open("/")}
           style={({ pressed }) => [
             styles.homeLink,
             pressed && styles.pressed,
           ]}
         >
           <AppText variant="bodyStrong" color={Palette.forest}>
-            Zur Startseite
+            {router.canGoBack() ? "Zurück" : "Zur Startseite"}
           </AppText>
         </Pressable>
       </View>

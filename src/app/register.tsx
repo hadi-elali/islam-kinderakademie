@@ -3,6 +3,8 @@ import { useEffect, useRef, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
 import { AuthCaptcha } from "@/components/auth/auth-captcha";
+import { PrivacyChoices } from "@/components/privacy-choices";
+import type { PrivacyChoices as Choices } from "@/constants/privacy";
 import type { AuthCaptchaHandle } from "@/components/auth/auth-captcha.types";
 import {
   AuthField,
@@ -34,6 +36,11 @@ export default function RegisterScreen() {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const [paymentAccepted, setPaymentAccepted] = useState(false);
+  const [privacyChoices, setPrivacyChoices] = useState<Choices>({
+    guardianConfirmed: false,
+    childDataGranted: false,
+    recordingGranted: false,
+  });
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod | null>(
     null,
   );
@@ -111,6 +118,11 @@ export default function RegisterScreen() {
       return;
     }
 
+    if (!privacyChoices.guardianConfirmed || !privacyChoices.childDataGranted) {
+      setError("Bitte bestätige deine Sorgeberechtigung und die ausdrückliche Einwilligung für Kinderprofile und Lernstände.");
+      return;
+    }
+
     if (!captchaToken) {
       setError("Bitte bestätige zuerst die hCaptcha-Prüfung.");
       return;
@@ -128,6 +140,7 @@ export default function RegisterScreen() {
         payerName: normalizedPayerName,
       },
       captchaToken,
+      privacyChoices,
     );
 
     captchaRef.current?.reset();
@@ -372,6 +385,7 @@ export default function RegisterScreen() {
           {/* Zustimmung */}
           <Pressable
             accessibilityRole="checkbox"
+            aria-checked={paymentAccepted}
             accessibilityState={{ checked: paymentAccepted }}
             onPress={() => setPaymentAccepted((current) => !current)}
             style={({ pressed }) => [
@@ -403,6 +417,8 @@ export default function RegisterScreen() {
           </Pressable>
         </View>
 
+        <PrivacyChoices value={privacyChoices} onChange={setPrivacyChoices} disabled={submitting} />
+
         {isHCaptchaConfigured && (
           <AuthCaptcha
             ref={captchaRef}
@@ -422,6 +438,8 @@ export default function RegisterScreen() {
             !isConfigured ||
             !paymentAccepted ||
             !paymentMethod ||
+            !privacyChoices.childDataGranted ||
+            !privacyChoices.guardianConfirmed ||
             payerName.trim().length < 2 ||
             !isHCaptchaConfigured ||
             !captchaToken

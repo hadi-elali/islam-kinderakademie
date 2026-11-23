@@ -142,7 +142,7 @@ Der Einstieg liegt in `src/app/_layout.tsx`.
 - `/register` – Registrierung
 - `/passwort-vergessen` – Passwort-Wiederherstellung
 - `/impressum` – öffentliches Impressum mit Anbieter-, Kontakt- und Registerangaben
-- `/datenschutz` – öffentlicher, ausdrücklich unvollständiger Datenschutzplatzhalter
+- `/datenschutz` – vollständiger öffentlicher Datenschutztext aus der versionierten Datei unter `docs/legal/`; keine erfundenen Anbieterfristen oder pauschalen Aussagen über geprüfte Verträge ergänzen
 
 Geschützte Routen:
 
@@ -183,6 +183,7 @@ Zentrale Dateien:
 Unterstützte Abläufe:
 
 - Registrierung mit Anzeigename, E-Mail, Passwort, Zahlungsart und dem Namen des verwendeten Zahlungskontos
+- einmalige, getrennte Einwilligungen bei der Registrierung: bestätigte Sorgeberechtigung und ausdrückliche Kinderprofil-/Lerndaten-Einwilligung; ursprüngliche Unterrichtsaufnahmen bleiben freiwillig
 - optionale E-Mail-Bestätigung über Supabase
 - Anmeldung mit E-Mail und Passwort
 - persistente Sitzung im Browser und auf nativen Geräten
@@ -216,6 +217,8 @@ Der Name des Zahlungskontos ist bei neuen Registrierungen verpflichtend und beze
 Die Accountlöschung läuft ausschließlich über die Edge Function `delete-account`. Der Client bestätigt davor E-Mail und Passwort erneut; die Function akzeptiert nur eine höchstens zehn Minuten alte Anmeldung und ermittelt die User-ID aus dem serverseitig validierten Bearer-Token. Beim Löschen wird die Zahlungsvereinbarung vom Auth-Nutzer getrennt, der Zahlername anonymisiert und die Vereinbarung beendet. Die Buchungshistorie bleibt bestehen. Das letzte Admin-Konto kann weder über die App noch direkt über die Auth-Administration gelöscht werden.
 
 Supabase verwaltet eigentliche Auth-Nutzer in `auth.users`. Niemals eine eigene Passworttabelle anlegen.
+
+Die Einwilligungen werden serverseitig in `privacy_consent_events` mit Verweis auf den unveränderlichen Textnachweis in `privacy_document_versions` erfasst. Auth-Metadaten sind nur beim Anlegen des Auth-Kontos eine Eingabequelle und dürfen spätere Entscheidungen nicht überschreiben. Keine Einwilligungen für Bestandskonten rückdatieren oder aus einer Beitragszustimmung ableiten. `PrivacyProvider` verhindert das Vorausladen von Familiendaten vor aktueller Einwilligung und leert beim Widerruf den geschützten Datenkontext. Konto und Rechtstexte bleiben erreichbar. Änderungen und Widerruf sind unter „Meine Datenschutzentscheidungen“ möglich. Die aktuelle Aufnahmefreigabe kann das Team in „Gruppen“ innerhalb seiner bestehenden Altersgruppengrenze prüfen; Zoom wird dadurch nicht automatisch gesteuert. Details und Release-Reihenfolge: `docs/legal/README.md`.
 
 ## 7. Rollenmodell
 
@@ -540,6 +543,8 @@ Neu lokal vorbereitet: `20261010120000_teaching_age_groups_and_portraits.sql` er
 `20261010140000_admin_teaching_age_group.sql` ermöglicht eine optionale Dozentenzuordnung für Admins und erhält sie beim Speichern der Adminrolle. Die bestehenden Admin-Berechtigungen gelten weiterhin für alle Altersgruppen; die Zuordnung dient ausschließlich der Dozentenanzeige für Familien.
 
 Weitere Seeds oder fachliche Beispieldaten nur auf ausdrücklichen Auftrag anlegen.
+
+`20261115120000_privacy_consents.sql` wurde am 15. November 2026 remote als angewendet bestätigt und darf nicht umgeschrieben werden. Die Ergänzung `20261123120000_hcaptcha_privacy_consent.sql` archiviert die neue Fassung vom 23. November, ergänzt den Registrierungshinweis zu hCaptcha und erhält unveränderte ältere Kinder-/Aufnahmeentscheidungen durch Zwecktextvergleich. Diese neue Migration ist nur lokal vorbereitet und muss vor dem neuen Client angewendet werden. Die Regression `supabase/tests/privacy_consents.sql` prüft Registrierung, Zugriffsschutz, getrennte Entscheidungen, Widerruf und Lehrkräftebereiche. hCaptcha wird auf Web und Native erst nach eigener Zustimmung geladen; die Kontaktalternative ohne CAPTCHA muss organisatorisch angeboten werden. Widerruf lädt Web neu und entfernt Native-WebView und Token. Die Ladeentscheidung ist nur im Arbeitsspeicher gültig; ein Registrierungseintrag ist lediglich historischer Nachweis. Öffentliche Anbieterbedingungen sind geprüft; Kontohistorie und ein möglicher IONOS-Altvertrag bleiben davon zu unterscheiden. Die Tests bescheinigen keine rechtliche Vollprüfung.
 
 ## 11. Aktueller Funktionsstand
 

@@ -1,0 +1,329 @@
+{
+  "observedAt": "2026-11-15T17:34:28.726Z",
+  "target": "https://www.bufib-kinder.de",
+  "observation": "Fresh headless browser contexts; public pages only; no captcha solved, no form submitted; no personal browser profile used.",
+  "redaction": "Cookie/storage values, request bodies and URL parameter values are not saved.",
+  "results": [
+    {
+      "page": "/",
+      "freshContext": true,
+      "formsSubmitted": false,
+      "challengeClicked": false,
+      "requests": [],
+      "storageChanges": [
+        {
+          "origin": "https://www.bufib-kinder.de",
+          "local": true,
+          "key": "lswt-<ephemeral-storage-support-check>"
+        }
+      ],
+      "failedRequests": 0,
+      "frameOrigins": [],
+      "dom": {
+        "title": "",
+        "textLength": 936,
+        "hasRegistrationHeading": true,
+        "hasCaptchaText": false,
+        "iframeUrls": [],
+        "localStorageKeys": [],
+        "sessionStorageKeys": []
+      },
+      "cookies": [],
+      "storage": [
+        {
+          "origin": "https://www.bufib-kinder.de",
+          "local": true,
+          "keys": []
+        },
+        {
+          "origin": "https://www.bufib-kinder.de",
+          "local": false,
+          "keys": []
+        }
+      ]
+    },
+    {
+      "page": "/register",
+      "freshContext": true,
+      "formsSubmitted": false,
+      "challengeClicked": false,
+      "requests": [
+        {
+          "origin": "https://js.hcaptcha.com",
+          "path": "/1/api.js",
+          "queryKeys": [
+            "hl",
+            "onload",
+            "render",
+            "uj"
+          ],
+          "method": "GET",
+          "type": "Script",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://<dynamic>.w.hcaptcha.com",
+          "path": "/logo.png",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "Fetch",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/captcha/v1/221126bfaff10f69f5e2c60a7ff42e4b9f16aed7/static/hcaptcha.html",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "Document",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/captcha/v1/221126bfaff10f69f5e2c60a7ff42e4b9f16aed7/static/i18n/de.json",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "XHR",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://<dynamic>.w.hcaptcha.com",
+          "path": "/logo.png",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "Fetch",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://api.hcaptcha.com",
+          "path": "/checksiteconfig",
+          "queryKeys": [
+            "host",
+            "sc",
+            "sitekey",
+            "spst",
+            "swa",
+            "v"
+          ],
+          "method": "POST",
+          "type": "XHR",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/c/0f12bade536544fdadd23b479d26fa9c0445785438eea3f99b28962ac30438fc/hsw.js",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "Script",
+          "bodyKeys": []
+        }
+      ],
+      "storageChanges": [
+        {
+          "origin": "https://www.bufib-kinder.de",
+          "local": true,
+          "key": "lswt-<ephemeral-storage-support-check>"
+        }
+      ],
+      "failedRequests": 1,
+      "frameOrigins": [],
+      "dom": {
+        "title": "",
+        "textLength": 674,
+        "hasRegistrationHeading": true,
+        "hasCaptchaText": false,
+        "iframeUrls": [
+          {
+            "origin": "https://newassets.hcaptcha.com",
+            "path": "/captcha/v1/221126bfaff10f69f5e2c60a7ff42e4b9f16aed7/static/hcaptcha.html",
+            "queryKeys": []
+          },
+          {
+            "origin": "https://newassets.hcaptcha.com",
+            "path": "/captcha/v1/221126bfaff10f69f5e2c60a7ff42e4b9f16aed7/static/hcaptcha.html",
+            "queryKeys": []
+          }
+        ],
+        "localStorageKeys": [],
+        "sessionStorageKeys": []
+      },
+      "cookies": [
+        {
+          "name": "__cf_bm",
+          "domain": ".hcaptcha.com",
+          "path": "/",
+          "secure": true,
+          "httpOnly": true,
+          "sameSite": "None",
+          "session": false,
+          "expiresInDays": 0.02
+        }
+      ],
+      "storage": [
+        {
+          "origin": "https://www.bufib-kinder.de",
+          "local": true,
+          "keys": []
+        },
+        {
+          "origin": "https://www.bufib-kinder.de",
+          "local": false,
+          "keys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "local": true,
+          "keys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "local": false,
+          "keys": []
+        }
+      ]
+    },
+    {
+      "page": "/passwort-vergessen",
+      "freshContext": true,
+      "formsSubmitted": false,
+      "challengeClicked": false,
+      "requests": [
+        {
+          "origin": "https://js.hcaptcha.com",
+          "path": "/1/api.js",
+          "queryKeys": [
+            "hl",
+            "onload",
+            "render",
+            "uj"
+          ],
+          "method": "GET",
+          "type": "Script",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://<dynamic>.w.hcaptcha.com",
+          "path": "/logo.png",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "Fetch",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/captcha/v1/221126bfaff10f69f5e2c60a7ff42e4b9f16aed7/static/hcaptcha.html",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "Document",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/captcha/v1/221126bfaff10f69f5e2c60a7ff42e4b9f16aed7/static/i18n/de.json",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "XHR",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://<dynamic>.w.hcaptcha.com",
+          "path": "/logo.png",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "Fetch",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://api.hcaptcha.com",
+          "path": "/checksiteconfig",
+          "queryKeys": [
+            "host",
+            "sc",
+            "sitekey",
+            "spst",
+            "swa",
+            "v"
+          ],
+          "method": "POST",
+          "type": "XHR",
+          "bodyKeys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "path": "/c/0f12bade536544fdadd23b479d26fa9c0445785438eea3f99b28962ac30438fc/hsw.js",
+          "queryKeys": [],
+          "method": "GET",
+          "type": "Script",
+          "bodyKeys": []
+        }
+      ],
+      "storageChanges": [
+        {
+          "origin": "https://www.bufib-kinder.de",
+          "local": true,
+          "key": "lswt-<ephemeral-storage-support-check>"
+        }
+      ],
+      "failedRequests": 1,
+      "frameOrigins": [],
+      "dom": {
+        "title": "",
+        "textLength": 216,
+        "hasRegistrationHeading": false,
+        "hasCaptchaText": false,
+        "iframeUrls": [
+          {
+            "origin": "https://newassets.hcaptcha.com",
+            "path": "/captcha/v1/221126bfaff10f69f5e2c60a7ff42e4b9f16aed7/static/hcaptcha.html",
+            "queryKeys": []
+          },
+          {
+            "origin": "https://newassets.hcaptcha.com",
+            "path": "/captcha/v1/221126bfaff10f69f5e2c60a7ff42e4b9f16aed7/static/hcaptcha.html",
+            "queryKeys": []
+          }
+        ],
+        "localStorageKeys": [],
+        "sessionStorageKeys": []
+      },
+      "cookies": [
+        {
+          "name": "__cf_bm",
+          "domain": ".hcaptcha.com",
+          "path": "/",
+          "secure": true,
+          "httpOnly": true,
+          "sameSite": "None",
+          "session": false,
+          "expiresInDays": 0.02
+        }
+      ],
+      "storage": [
+        {
+          "origin": "https://www.bufib-kinder.de",
+          "local": true,
+          "keys": []
+        },
+        {
+          "origin": "https://www.bufib-kinder.de",
+          "local": false,
+          "keys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "local": true,
+          "keys": []
+        },
+        {
+          "origin": "https://newassets.hcaptcha.com",
+          "local": false,
+          "keys": []
+        }
+      ]
+    }
+  ],
+  "limitations": [
+    "Only passive page loads were observed; no CAPTCHA interaction, account registration or password-reset submission occurred.",
+    "Headless-browser and vendor responses may differ from an interactive browser; one loading failure was observed on each CAPTCHA page.",
+    "No browser observation proves the absence of every possible processing purpose or establishes a legal exemption by itself."
+  ]
+}

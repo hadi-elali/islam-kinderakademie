@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { StyleSheet, useWindowDimensions, View } from "react-native";
 
 import PdfReader from "@/components/pdf-reader";
-import YoutubeVideoPlayer from "@/components/YoutubeVideoPlayer";
+import { ConsentedYoutubePlayer } from "@/components/consented-youtube-player";
 import { AppIcon } from "@/components/ui/app-icon";
 import { ChoiceChips, DataLoading, ErrorBanner } from "@/components/ui/data-ui";
 import {
@@ -636,7 +636,7 @@ export default function LessonDetailScreen() {
                 }}
               >
                 {youtubePlayerWidth > 0 && (
-                  <YoutubeVideoPlayer
+                  <ConsentedYoutubePlayer
                     key={youtubeVideoId}
                     videoId={youtubeVideoId}
                     width={youtubePlayerWidth}
