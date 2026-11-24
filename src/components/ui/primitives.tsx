@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, type RefObject } from "react";
 import {
   Pressable,
   ScrollView,
@@ -207,6 +207,7 @@ type PageScaffoldProps = {
   description?: string;
   action?: ReactNode;
   actionAbove?: boolean;
+  scrollRef?: RefObject<ScrollView | null>;
 };
 
 export function PageScaffold({
@@ -217,12 +218,14 @@ export function PageScaffold({
   description,
   action,
   actionAbove = false,
+  scrollRef,
 }: PageScaffoldProps) {
   const { width } = useWindowDimensions();
   const compact = width < Layout.compactBreakpoint;
 
   return (
     <ScrollView
+      ref={scrollRef}
       style={styles.pageScroll}
       contentContainerStyle={[
         styles.pageScrollContent,

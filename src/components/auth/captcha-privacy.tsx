@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { Linking, Platform, View } from 'react-native';
 
 import { ActionButton, AppText } from '@/components/ui/primitives';
+import { ConsentDetails } from '@/components/consent-details';
 import { Palette, Space } from '@/constants/design';
 import { CAPTCHA_CONSENT_TEXT } from '@/constants/privacy';
 import { clearCaptchaConsent, grantCaptchaConsent, useCaptchaConsent } from '@/lib/captcha-consent';
@@ -14,27 +15,36 @@ function withdraw() {
   if (Platform.OS === 'web' && typeof window !== 'undefined') window.location.reload();
 }
 
-export function CaptchaWithdrawal() {
+export function CaptchaWithdrawal({ compact = false }: { compact?: boolean }) {
   const consent = useCaptchaConsent();
   return <View style={{ gap: Space.sm }}>
-    <AppText variant="small" color={Palette.inkSoft}>
-      {consent ? 'hCaptcha ist für diese geöffnete Seite bzw. App-Sitzung erlaubt. Beim Widerruf wird die Webseite neu geladen; nicht abgesendete Eingaben gehen verloren. Bereits gesetzte Anbieter-Cookies kannst du in den Browsereinstellungen löschen.' : 'Für diese geöffnete Seite bzw. App-Sitzung ist hCaptcha nicht freigegeben.'}
-    </AppText>
-    {consent && <ActionButton label="hCaptcha-Einwilligung widerrufen" variant="secondary" onPress={withdraw} />}
+    {!compact && <AppText color={Palette.inkSoft} style={{ fontSize: 16, lineHeight: 26 }}>
+      {consent ? 'hCaptcha ist für diesen Besuch aktiviert. Die Einwilligung kann hier jederzeit widerrufen werden.' : 'hCaptcha ist derzeit nicht aktiviert. Der Dienst wird erst nach Ihrer Zustimmung geladen.'}
+    </AppText>}
+    {consent && <>
+      <AppText color={Palette.inkSoft} style={{ fontSize: compact ? 14 : 16, lineHeight: compact ? 20 : 26 }}>
+        {Platform.OS === 'web' ? (compact ? 'Ein Widerruf lädt die Seite neu und verwirft nicht abgesendete Eingaben.' : 'Beim Widerruf wird diese Seite neu geladen. Nicht abgesendete Eingaben gehen dabei verloren. Bereits gesetzte Anbieter-Cookies lassen sich zusätzlich in den Browsereinstellungen entfernen.') : 'Beim Widerruf wird die Sicherheitsprüfung geschlossen. Bereits gespeicherte Anbieterinformationen lassen sich zusätzlich in den Geräteeinstellungen entfernen.'}
+      </AppText>
+      <ActionButton label="hCaptcha-Einwilligung widerrufen" variant="secondary" lableStyle={{ fontSize: 16 }} onPress={withdraw} />
+    </>}
   </View>;
 }
 
 export function CaptchaPrivacyGate({ children, disabled }: { children: ReactNode; disabled?: boolean }) {
   const consent = useCaptchaConsent();
   return <View style={{ gap: Space.md, width: '100%' }}>
-    {consent ? <>{children}<CaptchaWithdrawal /></> : <>
-      <AppText variant="bodyStrong">Deine Entscheidung zu hCaptcha</AppText>
-      <AppText variant="small" color={Palette.inkSoft}>{CAPTCHA_CONSENT_TEXT}</AppText>
-      <ActionButton label="Einwilligen und hCaptcha laden" variant="secondary" disabled={disabled} onPress={grantCaptchaConsent} />
+    {consent ? <>{children}<CaptchaWithdrawal compact /></> : <>
+      <AppText variant="bodyStrong">Sicherheitsprüfung</AppText>
+      <AppText color={Palette.inkSoft} style={{ fontSize: 16, lineHeight: 24 }}>hCaptcha (Intuition Machines, USA) verarbeitet zur Bot-Prüfung IP-/Gerätedaten und Interaktionen; Cookies bis 30 Tage. Ich willige ausdrücklich ein, auch soweit dabei religiöse Überzeugungen erkennbar werden.</AppText>
+      <ConsentDetails title="hCaptcha" text={CAPTCHA_CONSENT_TEXT}>
+        <Link href="/datenschutz" target="_blank" rel="noopener noreferrer" style={{ color: Palette.forest, textDecorationLine: 'underline' }}>Datenschutzerklärung</Link>
+      </ConsentDetails>
     </>}
-    <Link href="/datenschutz" style={{ color: Palette.forest, textDecorationLine: 'underline' }}>Datenschutzerklärung lesen</Link>
-    <ActionButton label="Ohne hCaptcha Kontakt aufnehmen" variant="secondary" disabled={disabled}
-      onPress={() => void Linking.openURL('mailto:info@bufib.de?subject=Kontoanliegen%20ohne%20hCaptcha')} />
-    <AppText variant="small" color={Palette.muted}>Ohne Zustimmung wird hCaptcha nicht geladen. Für eine Kontoanlage, Zugangshilfe oder Kontolöschung kannst du uns über info@bufib.de kontaktieren. Der Unterricht ist unabhängig von dieser Zustimmung.</AppText>
+    <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: Space.sm }}>
+      {!consent && <ActionButton label="Einwilligen und hCaptcha laden" variant="secondary" disabled={disabled} onPress={grantCaptchaConsent} style={{ flexGrow: 1, flexBasis: 180 }} />}
+      <ActionButton label="Ohne hCaptcha per E-Mail" variant="secondary" disabled={disabled}
+        style={{ flexGrow: 1, flexBasis: 180 }} onPress={() => void Linking.openURL('mailto:info@bufib.de?subject=Kontoanliegen%20ohne%20hCaptcha')} />
+    </View>
+    {!consent && <AppText color={Palette.inkSoft} style={{ fontSize: 14, lineHeight: 20 }}>Jederzeit widerrufbar. Alternativ Kontoanlage, Zugangshilfe und Löschung per E-Mail; die Unterrichtsteilnahme bleibt möglich.</AppText>}
   </View>;
 }

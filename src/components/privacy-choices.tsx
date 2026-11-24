@@ -1,52 +1,46 @@
-import { Href, useRouter } from 'expo-router';
+import { Link } from 'expo-router';
 import type { Dispatch, SetStateAction } from 'react';
-import { Pressable, StyleSheet, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
 import { AppText } from '@/components/ui/primitives';
-import { CHILD_DATA_CONSENT_TEXT, GUARDIAN_CONSENT_TEXT, PRIVACY_DATE, RECORDING_CONSENT_TEXT, type PrivacyChoices as Choices } from '@/constants/privacy';
-import { Palette, Radius, Space } from '@/constants/design';
+import { ConsentDetails } from '@/components/consent-details';
+import { ConsentCheckbox } from '@/components/consent-checkbox';
+import { CHILD_DATA_CONSENT_TEXT, GUARDIAN_CONSENT_TEXT, RECORDING_CONSENT_TEXT, type PrivacyChoices as Choices } from '@/constants/privacy';
+import { Palette, Space } from '@/constants/design';
 
 export function PrivacyChoices({ value, onChange, disabled = false }: {
   value: Choices; onChange: Dispatch<SetStateAction<Choices>>; disabled?: boolean;
 }) {
-  const router = useRouter();
   return <View style={styles.content}>
-    <AppText variant="heading">Datenschutz und Einwilligungen</AppText>
-    <AppText color={Palette.inkSoft}>Bitte lies die Erklärungen vor deiner Entscheidung. Die Aufnahme ist freiwillig. Alle Angaben gelten für die Kinder, die du berechtigt diesem Familienkonto zuordnest.</AppText>
-    <Pressable accessibilityRole="link" onPress={() => router.push('/datenschutz' as Href)}>
-      <AppText color={Palette.forest} style={styles.link}>Datenschutzerklärung lesen · Stand {PRIVACY_DATE}</AppText>
-    </Pressable>
-    <Check label="Sorgeberechtigung bestätigen" checked={value.guardianConfirmed} disabled={disabled}
+    <AppText variant="heading">Datenschutz</AppText>
+    <AppText style={styles.note} color={Palette.inkSoft}>Verantwortlich: Bund für islamische Bildung e. V.</AppText>
+    <Check title="Sorgeberechtigung" label="Ich bin volljährig und sorgeberechtigt oder wirksam zur Abgabe dieser Erklärungen bevollmächtigt." checked={value.guardianConfirmed} disabled={disabled}
       onPress={() => onChange((current) => ({ ...current, guardianConfirmed: !current.guardianConfirmed }))} text={GUARDIAN_CONSENT_TEXT} />
-    <Check label="Ausdrückliche Einwilligung für Kinderprofile und Lernstände" checked={value.childDataGranted} disabled={disabled}
+    <Check title="Kinderprofile und Lernstände" label="Ich willige ausdrücklich in die Verarbeitung von Kinderprofilen und Lernständen für den Unterricht ein, auch bei möglichem Religionsbezug." checked={value.childDataGranted} disabled={disabled}
       onPress={() => onChange((current) => ({ ...current, childDataGranted: !current.childDataGranted }))} text={CHILD_DATA_CONSENT_TEXT} />
-    <Check label="Freiwillige ursprüngliche Unterrichtsaufnahme erlauben" checked={value.recordingGranted} disabled={disabled}
+    <Check title="Freiwillige Unterrichtsaufnahmen" label="Freiwillig: Ich willige ausdrücklich in ursprüngliche Zoom-Aufnahmen mit Bild, Stimme und möglichen Religionsbezügen ein. Bei YouTube dürfen keine Kinder erkennbar sein." checked={value.recordingGranted} disabled={disabled}
       onPress={() => onChange((current) => ({ ...current, recordingGranted: !current.recordingGranted }))} text={RECORDING_CONSENT_TEXT} />
-    <AppText variant="small" color={Palette.muted}>Die Entscheidungen werden mit Zeitpunkt und Textversion dokumentiert. Du kannst sie im Konto einsehen und für die Zukunft widerrufen. Eine Ablehnung der Aufnahme verhindert die Registrierung nicht.</AppText>
+    <View style={styles.footer}>
+      <AppText style={styles.note} color={Palette.inkSoft}>Die ersten beiden Angaben sind erforderlich. Aufnahmen sind freiwillig. Widerruf jederzeit im Konto.</AppText>
+      <Link href="/datenschutz" target="_blank" rel="noopener noreferrer" style={styles.link}>Datenschutzerklärung</Link>
+    </View>
   </View>;
 }
 
-function Check({ label, text, checked, disabled, onPress }: {
-  label: string; text: string; checked: boolean; disabled: boolean; onPress: () => void;
+function Check({ title, label, text, checked, disabled, onPress }: {
+  title: string; label: string; text: string; checked: boolean; disabled: boolean; onPress: () => void;
 }) {
-  return <Pressable accessibilityRole="checkbox" accessibilityLabel={label}
-    aria-checked={checked} aria-disabled={disabled}
-    accessibilityState={{ checked, disabled }} disabled={disabled} onPress={onPress}
-    style={({ pressed }) => [styles.choice, pressed && styles.pressed]}>
-    <View style={[styles.checkbox, checked && styles.checked]}><AppText color={checked ? Palette.paper : Palette.forest}>{checked ? '✓' : ''}</AppText></View>
-    <View style={styles.copy}>
-      <AppText variant="bodyStrong">{label}</AppText>
-      <AppText variant="small" color={Palette.inkSoft}>{text}</AppText>
-    </View>
-  </Pressable>;
+  return <View style={styles.choiceGroup}>
+    <ConsentCheckbox label={label} checked={checked} disabled={disabled} onChange={onPress} />
+    <View style={styles.details}><ConsentDetails title={title} text={text} /></View>
+  </View>;
 }
 
 const styles = StyleSheet.create({
-  content: { gap: Space.lg, minWidth: 0 },
-  choice: { flexDirection: 'row', alignItems: 'flex-start', gap: Space.md },
-  copy: { flex: 1, minWidth: 0, gap: Space.sm },
-  checkbox: { width: 24, height: 24, borderWidth: 1, borderColor: Palette.forest, borderRadius: Radius.small, alignItems: 'center', justifyContent: 'center' },
-  checked: { backgroundColor: Palette.forest },
-  link: { textDecorationLine: 'underline' },
-  pressed: { opacity: 0.7 },
+  content: { gap: Space.md, minWidth: 0 },
+  choiceGroup: { gap: Space.xs },
+  details: { paddingLeft: 24 + Space.md },
+  note: { fontSize: 14, lineHeight: 20 },
+  footer: { gap: Space.sm },
+  link: { color: Palette.forest, textDecorationLine: 'underline', fontSize: 14, lineHeight: 20 },
 });

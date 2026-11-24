@@ -57,7 +57,10 @@ function RootNavigator() {
   const isLoadingInitialProfile =
     isAuthenticated && isProfileLoading && !profile;
 
-  if (isInitializing || isLoadingInitialProfile) {
+  // Privacy information must be readable before authentication initializes,
+  // including in the generated HTML when JavaScript is unavailable.
+  const isPrivacyPage = pathname === '/datenschutz';
+  if ((isInitializing || isLoadingInitialProfile) && !isPrivacyPage) {
     return (
       <View style={styles.loadingScreen}>
         <BrandMark dark={true} style={{width: 200}}/>

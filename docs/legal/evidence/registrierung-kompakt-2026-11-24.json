@@ -1,0 +1,198 @@
+{
+  "date": "2026-11-24",
+  "purpose": "Compact registration consent interface",
+  "noFormsSubmitted": true,
+  "tests": [
+    {
+      "width": 320,
+      "before": {
+        "consentHeight": 2310,
+        "pageHeight": 4939,
+        "overflow": false,
+        "checked": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "after": {
+        "consentHeight": 729,
+        "pageHeight": 2635,
+        "overflow": false,
+        "checked": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "beforeConsentCaptchaRequests": 0,
+      "consentHeightReductionPercent": 68,
+      "details": [
+        {
+          "purpose": "Sorgeberechtigung",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        },
+        {
+          "purpose": "Kinderprofile und Lernstände",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        },
+        {
+          "purpose": "Freiwillige Unterrichtsaufnahmen",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        },
+        {
+          "purpose": "hCaptcha",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        }
+      ],
+      "optionalRecordingUnselected": true,
+      "noCaptchaAfterReadingDetails": true
+    },
+    {
+      "width": 390,
+      "before": {
+        "consentHeight": 1696,
+        "pageHeight": 3921,
+        "overflow": false,
+        "checked": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "after": {
+        "consentHeight": 589,
+        "pageHeight": 2285,
+        "overflow": false,
+        "checked": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "beforeConsentCaptchaRequests": 0,
+      "consentHeightReductionPercent": 65,
+      "details": [
+        {
+          "purpose": "Sorgeberechtigung",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        },
+        {
+          "purpose": "Kinderprofile und Lernstände",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        },
+        {
+          "purpose": "Freiwillige Unterrichtsaufnahmen",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        },
+        {
+          "purpose": "hCaptcha",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        }
+      ],
+      "optionalRecordingUnselected": true,
+      "noCaptchaAfterReadingDetails": true,
+      "afterConsentCaptchaRequests": 5,
+      "afterWithdrawalCaptchaRequests": 0
+    },
+    {
+      "width": 1440,
+      "before": {
+        "consentHeight": 1328,
+        "pageHeight": 3389,
+        "overflow": false,
+        "checked": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "after": {
+        "consentHeight": 497,
+        "pageHeight": 2083,
+        "overflow": false,
+        "checked": [
+          false,
+          false,
+          false,
+          false
+        ]
+      },
+      "beforeConsentCaptchaRequests": 0,
+      "consentHeightReductionPercent": 63,
+      "details": [
+        {
+          "purpose": "Sorgeberechtigung",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        },
+        {
+          "purpose": "Kinderprofile und Lernstände",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        },
+        {
+          "purpose": "Freiwillige Unterrichtsaufnahmen",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        },
+        {
+          "purpose": "hCaptcha",
+          "expanded": true,
+          "fullTextAvailable": true,
+          "visible": true,
+          "formPreserved": true,
+          "choicesPreserved": true
+        }
+      ],
+      "optionalRecordingUnselected": true,
+      "noCaptchaAfterReadingDetails": true
+    }
+  ]
+}

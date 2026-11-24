@@ -634,6 +634,10 @@ src/
     auth-errors.ts         deutsche Auth-Fehlermeldungen
 ```
 
+Die Datenschutzseite verwendet seit dem 24. November die separaten Web-/Native-Renderer `privacy-document`. Im Web sind Überschriften, Inhaltsverzeichnis, Linkfokus und ein deutscher Dokumentbereich semantisch ausgezeichnet. hCaptcha-Status und Widerruf stehen in Abschnitt 11 mit Direktzugriff; keine Statusmeldung vor dem Erklärungstext ergänzen. Die Druckansicht wird durch `scripts/sync-privacy-documents.py` aus der unveränderten kanonischen Textfassung erzeugt. Darstellungsänderungen dürfen keine bestehende Migration oder Einwilligungshistorie umschreiben.
+
+Zustimmungen werden als kurze, getrennte Auswahltexte mit `ConsentDetails` angezeigt. Die vollständigen, archivierten Erklärungen bleiben direkt am Feld aufklappbar. Nicht durch das Öffnen der Details zustimmen, keine Checkbox vorauswählen und den Religionsbezug oder die Freiwilligkeit nicht aus der sichtbaren Ebene entfernen. Web verwendet echte HTML-Checkboxen über `ConsentCheckbox`. Das Lesen der hCaptcha-Details darf den Anbieter nicht laden. Bei bloßen Darstellungsänderungen bleiben Volltexte, Version und Datenbanknachweise unverändert.
+
 ## 13. Design- und UX-Regeln
 
 - Sprache der Oberfläche ist Deutsch.

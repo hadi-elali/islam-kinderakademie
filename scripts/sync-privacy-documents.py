@@ -2,6 +2,7 @@
 import argparse
 from pathlib import Path
 import hashlib
+import html
 import json
 import re
 
@@ -50,6 +51,45 @@ for title, content in re.findall(r'^## ([^\n]+)\n(.*?)(?=^## |\Z)', policy, re.M
 }, ensure_ascii=False, indent=2) + '\n')
 public.mkdir(parents=True, exist_ok=True)
 destination.write_text(policy)
+
+# A script-free, printable reading copy. Only presentation changes here;
+# the canonical Markdown and database snapshot retain their original hash.
+def inline_html(value):
+    value = html.escape(value)
+    value = re.sub(r'\[([^\]]+)\]\(([^)]+)\)', r'<a href="\2">\1</a>', value)
+    return re.sub(r'\*\*([^*]+)\*\*', r'<strong>\1</strong>', value)
+
+
+contents = '<nav aria-label="Inhaltsverzeichnis"><h2>Inhaltsverzeichnis</h2><ul>' + ''.join(
+    f'<li><a href="#abschnitt-{index}">{html.escape(section["title"])}</a></li>'
+    for index, section in enumerate(sections, 1)) + '</ul></nav>'
+body = []
+for index, section in enumerate(sections, 1):
+    paragraphs = section['paragraphs']
+    rendered = []
+    in_list = False
+    for paragraph in paragraphs:
+        bullet = paragraph.startswith('• ')
+        if bullet and not in_list:
+            rendered.append('<ul>')
+        if not bullet and in_list:
+            rendered.append('</ul>')
+        tag = 'li' if bullet else 'p'
+        rendered.append(f'<{tag}>' + inline_html(paragraph[2:] if bullet else paragraph) + f'</{tag}>')
+        in_list = bullet
+    if in_list:
+        rendered.append('</ul>')
+    body.append(f'<section><h2 id="abschnitt-{index}">{html.escape(section["title"])}</h2>' + ''.join(rendered) + '</section>')
+date = re.search(r'\*\*Stand: ([^*]+)\*\*', policy).group(1)
+printable = '''<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Datenschutzerklärung – Islam-Kinderakademie</title>
+<style>body{font:1rem/1.65 system-ui,sans-serif;color:#173D3A;max-width:72ch;margin:2rem auto;padding:0 1rem;overflow-wrap:anywhere}h1{font-size:clamp(1.6rem,5vw,2.15rem);line-height:1.3}h2{font-size:1.35rem;line-height:1.4;margin-top:2rem}p{white-space:pre-line}a{color:#1E5B52;text-underline-offset:.15em}a:focus-visible{outline:3px solid #1E5B52;outline-offset:3px}li{margin:.4rem 0}@media print{nav,.online-settings{display:none}h2{break-after:avoid}body{margin:0;max-width:none}}</style></head><body>
+<h1>Datenschutzerklärung</h1>'''
+printable += '<p>Stand: ' + html.escape(date) + '</p>'
+printable += '<p class="online-settings"><a href="https://www.bufib-kinder.de/datenschutz#hcaptcha-einstellungen">Zu den hCaptcha-Einstellungen und zum Widerruf auf der Website</a></p>'
+printable += contents + '<main>' + ''.join(body) + '</main></body></html>\n'
+(public / f'privacy-{version}.html').write_text(printable)
 
 
 def sql(value):

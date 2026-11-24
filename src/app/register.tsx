@@ -4,6 +4,7 @@ import { Pressable, StyleSheet, View } from "react-native";
 
 import { AuthCaptcha } from "@/components/auth/auth-captcha";
 import { PrivacyChoices } from "@/components/privacy-choices";
+import { ConsentCheckbox } from '@/components/consent-checkbox';
 import type { PrivacyChoices as Choices } from "@/constants/privacy";
 import type { AuthCaptchaHandle } from "@/components/auth/auth-captcha.types";
 import {
@@ -382,39 +383,12 @@ export default function RegisterScreen() {
             </View>
           )}
 
-          {/* Zustimmung */}
-          <Pressable
-            accessibilityRole="checkbox"
-            aria-checked={paymentAccepted}
-            accessibilityState={{ checked: paymentAccepted }}
-            onPress={() => setPaymentAccepted((current) => !current)}
-            style={({ pressed }) => [
-              styles.checkboxRow,
-              pressed && styles.pressed,
-            ]}
-          >
-            <View
-              style={[
-                styles.checkbox,
-                paymentAccepted && styles.checkboxChecked,
-              ]}
-            >
-              {paymentAccepted && (
-                <AppText variant="bodyStrong" color={Palette.paper}>
-                  ✓
-                </AppText>
-              )}
-            </View>
-
-            <View style={styles.checkboxText}>
-              <AppText color={Palette.inkSoft}>
-                Ich bin mit einem monatlichen Beitrag von{" "}
-                <AppText variant="bodyStrong">15,00 €</AppText> einverstanden
-                und werde diesen monatlich über die gewählte Zahlungsart
-                entrichten.
-              </AppText>
-            </View>
-          </Pressable>
+          <ConsentCheckbox
+            label="Ich stimme dem monatlichen Beitrag von 15,00 € zu und zahle über die gewählte Zahlungsart."
+            checked={paymentAccepted}
+            disabled={submitting}
+            onChange={() => setPaymentAccepted((current) => !current)}
+          />
         </View>
 
         <PrivacyChoices value={privacyChoices} onChange={setPrivacyChoices} disabled={submitting} />
@@ -545,30 +519,4 @@ const styles = StyleSheet.create({
     backgroundColor: Palette.forest,
   },
 
-  checkboxRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: Space.md,
-    marginTop: Space.sm,
-  },
-
-  checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 6,
-    borderWidth: 2,
-    borderColor: Palette.muted,
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 1,
-  },
-
-  checkboxChecked: {
-    backgroundColor: Palette.forest,
-    borderColor: Palette.forest,
-  },
-
-  checkboxText: {
-    flex: 1,
-  },
 });

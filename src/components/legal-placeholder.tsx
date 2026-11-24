@@ -1,5 +1,5 @@
 import { Href, useRouter } from "expo-router";
-import type { ReactNode } from "react";
+import type { ReactNode, RefObject } from "react";
 import {
   Linking,
   Pressable,
@@ -31,6 +31,9 @@ type LegalPlaceholderProps = {
   description: string;
   fields: LegalPlaceholderField[];
   isPlaceholder?: boolean;
+  documentTitle?: ReactNode;
+  documentContent?: ReactNode;
+  scrollRef?: RefObject<ScrollView | null>;
 };
 
 export function LegalPlaceholder({
@@ -38,6 +41,9 @@ export function LegalPlaceholder({
   description,
   fields,
   isPlaceholder = true,
+  documentTitle,
+  documentContent,
+  scrollRef,
 }: LegalPlaceholderProps) {
   const router = useRouter();
   const { width } = useWindowDimensions();
@@ -60,7 +66,7 @@ export function LegalPlaceholder({
         </Card>
       )}
 
-      <Card style={styles.fieldsCard}>
+      {documentContent ?? <Card style={styles.fieldsCard}>
         {fields.map((field, index) => (
           <View
             key={field.label}
@@ -87,7 +93,7 @@ export function LegalPlaceholder({
             ))}
           </View>
         ))}
-      </Card>
+      </Card>}
     </>
   );
 
@@ -95,9 +101,14 @@ export function LegalPlaceholder({
     return (
       <PageScaffold
         eyebrow="RECHTLICHES"
-        title={title}
-        description={description}
+        title={documentTitle ? undefined : title}
+        description={documentTitle ? undefined : description}
+        scrollRef={scrollRef}
       >
+        {documentTitle && <View style={styles.heading}>
+          {documentTitle}
+          <AppText color={Palette.inkSoft} style={styles.description}>{description}</AppText>
+        </View>}
         <View style={styles.authenticatedContent}>{legalContent}</View>
       </PageScaffold>
     );
@@ -105,6 +116,7 @@ export function LegalPlaceholder({
 
   return (
     <ScrollView
+      ref={scrollRef}
       style={styles.page}
       contentContainerStyle={styles.pageContent}
       showsVerticalScrollIndicator={false}
@@ -132,7 +144,7 @@ export function LegalPlaceholder({
           <Pill tone={isPlaceholder ? "sun" : "mint"}>
             {isPlaceholder ? "PLATZHALTER" : "RECHTLICHES"}
           </Pill>
-          <AppText variant={compact ? "title" : "display"}>{title}</AppText>
+          {documentTitle ?? <AppText variant={compact ? "title" : "display"}>{title}</AppText>}
           <AppText color={Palette.inkSoft} style={styles.description}>
             {description}
           </AppText>
