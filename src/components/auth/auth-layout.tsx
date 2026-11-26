@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 
 import { BrandMark } from '@/components/brand-mark';
-import { AppIcon } from '@/components/ui/app-icon';
+import { AppIcon, type AppIconName } from '@/components/ui/app-icon';
 import { AppText } from '@/components/ui/primitives';
 import { Layout, Palette, Radius, Space } from '@/constants/design';
 
@@ -65,9 +65,7 @@ export function AuthLayout({
             compact && { width: Math.max(width - Space.lg * 2, 0) },
           ]}>
           {!compact && (
-            <View style={styles.storyPanel}>
-              <View style={styles.storyShapeOne} />
-              <View style={styles.storyShapeTwo} />
+            <View testID="auth-intro" style={styles.storyPanel}>
               <View style={styles.storyContent}>
                 <View style={styles.storyIcon}>
                   <AppIcon name="journeys" size={30} color={Palette.ink} />
@@ -76,16 +74,28 @@ export function AuthLayout({
                   Ein sicherer Ort für den gemeinsamen Lernweg.
                 </AppText>
                 <View style={styles.storyList}>
-                  <StoryPoint label="Live-Termine übersichtlich im Kalender" />
-                  <StoryPoint label="Interaktive Lerneinheiten an einem Ort" />
-                  <StoryPoint label="Eigener Bereich für jede Familie" />
+                  <StoryPoint
+                    icon="calendar"
+                    backgroundColor={Palette.skySoft}
+                    label="Live-Termine übersichtlich im Kalender"
+                  />
+                  <StoryPoint
+                    icon="journeys"
+                    backgroundColor={Palette.sunSoft}
+                    label="Interaktive Lerneinheiten an einem Ort"
+                  />
+                  <StoryPoint
+                    icon="children"
+                    backgroundColor={Palette.mint}
+                    label="Eigener Bereich für jede Familie"
+                  />
                 </View>
               </View>
             </View>
           )}
 
           <View style={[styles.formColumn, compact && styles.formColumnCompact]}>
-            <View style={[styles.formCard, compact && styles.formCardCompact, small && styles.formCardSmall]}>
+            <View testID="auth-form-card" style={[styles.formCard, compact && styles.formCardCompact, small && styles.formCardSmall]}>
               <View style={styles.formHeading}>
                 <AppText variant="label" color={Palette.forest}>
                   {eyebrow}
@@ -144,13 +154,21 @@ export function InlineNotice({
   );
 }
 
-function StoryPoint({ label }: { label: string }) {
+function StoryPoint({
+  icon,
+  backgroundColor,
+  label,
+}: {
+  icon: AppIconName;
+  backgroundColor: string;
+  label: string;
+}) {
   return (
     <View style={styles.storyPoint}>
-      <View style={styles.storyCheck}>
-        <AppIcon name="check" size={17} color={Palette.sun} />
+      <View style={[styles.storyPointIcon, { backgroundColor }]}>
+        <AppIcon name={icon} size={21} color={Palette.forest} />
       </View>
-      <AppText color={Palette.white}>{label}</AppText>
+      <AppText color={Palette.white} style={styles.storyPointText}>{label}</AppText>
     </View>
   );
 }
@@ -162,7 +180,7 @@ const styles = StyleSheet.create({
   header: {
     width: '100%',
     boxSizing: 'border-box',
-    maxWidth: 1240,
+    maxWidth: 1120,
     minHeight: 82,
     paddingHorizontal: Space.xxl,
     flexDirection: 'row',
@@ -176,65 +194,53 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     boxSizing: 'border-box',
-    maxWidth: 1180,
-    minHeight: 650,
+    maxWidth: 1120,
     paddingHorizontal: Space.xxl,
     paddingTop: Space.lg,
     paddingBottom: Space.huge,
     flexDirection: 'row',
-    gap: Space.xxl,
+    alignItems: 'flex-start',
+    gap: Space.huge,
   },
   contentCompact: { justifyContent: 'center', paddingHorizontal: 0 },
   storyPanel: {
     flex: 1,
-    overflow: 'hidden',
-    borderRadius: 32,
-    backgroundColor: Palette.forestDark,
-    padding: 48,
-    justifyContent: 'center',
+    minWidth: 0,
+    alignSelf: 'flex-start',
+    backgroundColor: Palette.forest,
+    borderRadius: 28,
+    padding: Space.xxl,
   },
-  storyShapeOne: {
-    position: 'absolute',
-    width: 280,
-    height: 280,
-    borderRadius: 140,
-    borderWidth: 55,
-    borderColor: 'rgba(167,213,190,0.08)',
-    right: -110,
-    top: -80,
-  },
-  storyShapeTwo: {
-    position: 'absolute',
-    width: 190,
-    height: 190,
-    borderRadius: 45,
-    backgroundColor: 'rgba(242,201,109,0.06)',
-    left: -90,
-    bottom: -100,
-    transform: [{ rotate: '28deg' }],
-  },
-  storyContent: { maxWidth: 480 },
+  storyContent: { maxWidth: 440 },
   storyIcon: {
-    width: 62,
-    height: 62,
-    borderRadius: 21,
+    width: 54,
+    height: 54,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: Palette.sun,
+    backgroundColor: Palette.sunSoft,
     marginBottom: Space.xl,
   },
-  storyTitle: { fontSize: 40, lineHeight: 47, letterSpacing: -1.4 },
-  storyList: { gap: Space.lg, marginTop: 40 },
-  storyPoint: { flexDirection: 'row', alignItems: 'center', gap: Space.md },
-  storyCheck: {
-    width: 30,
-    height: 30,
-    borderRadius: 11,
+  storyTitle: { fontSize: 34, lineHeight: 42, letterSpacing: -0.8 },
+  storyList: { marginTop: Space.xl },
+  storyPoint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Space.md,
+    paddingVertical: Space.lg,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(255, 255, 255, 0.16)',
+  },
+  storyPointText: { flex: 1, minWidth: 0, fontSize: 16, lineHeight: 24 },
+  storyPointIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: Radius.small,
+    flexShrink: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.08)',
   },
-  formColumn: { width: '44%', minWidth: 420, justifyContent: 'center' },
+  formColumn: { width: '48%', minWidth: 420, justifyContent: 'flex-start' },
   formColumnCompact: { width: '100%', minWidth: 0, maxWidth: '100%' },
   formCard: {
     width: '100%',

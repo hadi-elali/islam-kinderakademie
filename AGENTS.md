@@ -638,6 +638,8 @@ Die Datenschutzseite verwendet seit dem 24. November die separaten Web-/Native-R
 
 Zustimmungen werden als kurze, getrennte Auswahltexte mit `ConsentDetails` angezeigt. Die vollständigen, archivierten Erklärungen bleiben direkt am Feld aufklappbar. Nicht durch das Öffnen der Details zustimmen, keine Checkbox vorauswählen und den Religionsbezug oder die Freiwilligkeit nicht aus der sichtbaren Ebene entfernen. Web verwendet echte HTML-Checkboxen über `ConsentCheckbox`. Das Lesen der hCaptcha-Details darf den Anbieter nicht laden. Bei bloßen Darstellungsänderungen bleiben Volltexte, Version und Datenbanknachweise unverändert.
 
+Bei Registrierung werden seit dem 25. November Sorge-/Vertretungsbestätigung und Kinder-/Lerndateneinwilligung über `combineGuardianConfirmation` gemeinsam ausgewählt. Beide Pflichtwerte werden explizit zusammen gesetzt oder gelöscht; die freiwillige Aufnahmeentscheidung bleibt davon unabhängig. Beide unveränderten Volltexte müssen unter den gemeinsamen Details erreichbar bleiben. Die gemeinsame Auswahl ersetzt keine Einwilligung in Aufnahmen, hCaptcha oder andere Zwecke. Andere Ansichten nutzen ohne diesen Parameter weiterhin getrennte Pflichtfelder.
+
 ## 13. Design- und UX-Regeln
 
 - Sprache der Oberfläche ist Deutsch.
@@ -646,6 +648,7 @@ Zustimmungen werden als kurze, getrennte Auswahltexte mit `ConsentDetails` angez
 - Keine Bildschirmbreite darf über feste Geräteprofile wie „iPhone 12“ behandelt werden. Layouts müssen fließend von kleinen Smartphones über Tablets bis zu großen Desktopfenstern funktionieren.
 - Horizontale Inhaltsbereiche müssen umbrechen oder untereinander wechseln. Karten, Eingaben, Textblöcke und Aktionsleisten erhalten auf schmalen Ansichten `minWidth: 0` beziehungsweise höchstens `100%` Breite; feste Mindestbreiten benötigen immer eine kompakte Überschreibung.
 - Bestehende Farbpalette und Komponenten aus `src/constants/design.ts` und `src/components/ui/` wiederverwenden.
+- Der Desktop-Infobereich in `AuthLayout` bleibt auf seine Inhaltshöhe begrenzt und oben ausgerichtet. Keine über die Formularhöhe gestreckte dunkle Fläche ergänzen. Unter 1024 Pixeln wird der Infobereich ausgeblendet; das Formular bleibt einspaltig.
 - Öffentliche Seiten dürfen die interne App-Shell nicht anzeigen.
 - Geschützte Seiten verwenden die gemeinsame App-Shell.
 - Leere Bereiche als klare Empty States darstellen, keine erfundenen Kursdaten einfügen.

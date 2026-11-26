@@ -1,0 +1,61 @@
+{
+  "date": "2026-11-25",
+  "purpose": "Combined guardian confirmation and child-data consent",
+  "noFormsSubmitted": true,
+  "tests": [
+    {
+      "width": 320,
+      "totalCheckboxes": 3,
+      "initiallyUnchecked": true,
+      "details": {
+        "guardianFullText": true,
+        "childFullText": true,
+        "visible": true,
+        "unchangedChoices": true,
+        "formPreserved": true
+      },
+      "keyboardToggle": true,
+      "combinedGrantIndependent": true,
+      "combinedRevoke": true,
+      "optionalRecordingIndependent": true,
+      "captchaRequests": 0,
+      "overflow": false
+    },
+    {
+      "width": 390,
+      "totalCheckboxes": 3,
+      "initiallyUnchecked": true,
+      "details": {
+        "guardianFullText": true,
+        "childFullText": true,
+        "visible": true,
+        "unchangedChoices": true,
+        "formPreserved": true
+      },
+      "keyboardToggle": true,
+      "combinedGrantIndependent": true,
+      "combinedRevoke": true,
+      "optionalRecordingIndependent": true,
+      "captchaRequests": 0,
+      "overflow": false
+    },
+    {
+      "width": 1440,
+      "totalCheckboxes": 3,
+      "initiallyUnchecked": true,
+      "details": {
+        "guardianFullText": true,
+        "childFullText": true,
+        "visible": true,
+        "unchangedChoices": true,
+        "formPreserved": true
+      },
+      "keyboardToggle": true,
+      "combinedGrantIndependent": true,
+      "combinedRevoke": true,
+      "optionalRecordingIndependent": true,
+      "captchaRequests": 0,
+      "overflow": false
+    }
+  ]
+}

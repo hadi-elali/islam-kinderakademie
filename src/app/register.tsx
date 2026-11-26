@@ -391,7 +391,7 @@ export default function RegisterScreen() {
           />
         </View>
 
-        <PrivacyChoices value={privacyChoices} onChange={setPrivacyChoices} disabled={submitting} />
+        <PrivacyChoices value={privacyChoices} onChange={setPrivacyChoices} disabled={submitting} combineGuardianConfirmation />
 
         {isHCaptchaConfigured && (
           <AuthCaptcha
